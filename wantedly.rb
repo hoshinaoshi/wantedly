@@ -1,5 +1,3 @@
-require "open-uri"
-require "nokogiri"
 require "mechanize"
 require "net/http"
 
