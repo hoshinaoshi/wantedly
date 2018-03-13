@@ -13,15 +13,11 @@ agent.get('https://www.wantedly.com/user/sign_in') do |loginpage|
   end.submit
   p "submitted"
 
-  page = agent.get("https://www.wantedly.com/enterprise/scouts#search%5Bkeywords%5D=&search%5Boccupation_types%5D%5B%5D=engineer&search%5Bactivity%5D=7&search%5Blocations%5D%5B%5D=kanto&search%5Bmotivation%5D=large&search%5Bscout_reply%5D=&search%5Bconnection%5D=&search%5Bscout_received%5D=&search%5Bage_range%5D=18-35&search%5Bgraduation_year%5D=&search%5Border%5D=recommend&search%5Bcountries%5D%5B%5D=japan&search%5Brecommended%5D=false&search%5Bbookmarked_users_params%5D=&filter_is_used=true")
-  # 検索条件をパラメータに指定
+  agent.get("https://www.wantedly.com/enterprise/scouts#search%5Bkeywords%5D=&search%5Boccupation_types%5D%5B%5D=engineer&search%5Bactivity%5D=7&search%5Blocations%5D%5B%5D=kanto&search%5Bmotivation%5D=large&search%5Bscout_reply%5D=&search%5Bconnection%5D=&search%5Bscout_received%5D=&search%5Bage_range%5D=18-35&search%5Bgraduation_year%5D=&search%5Border%5D=recommend&search%5Bcountries%5D%5B%5D=japan&search%5Brecommended%5D=false&search%5Bbookmarked_users_params%5D=&filter_is_used=true") do |page|
 
-  html = Nokogiri::HTML.parse(page)
-  p html
-  # p html.css('#main-inner')
-  html.css('.user-name-wrapper').each do |usr|
-    # p usr
+    html = Nokogiri::HTML.parse(page.body)
+    puts html
+
   end
-  p "end!"
 
 end
