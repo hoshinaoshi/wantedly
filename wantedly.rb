@@ -15,7 +15,7 @@ Capybara.configure do |config|
 end
 
 Capybara.register_driver :poltergeist do |app|
-    Capybara::Poltergeist::Driver.new(app, {:timeout=>120, :js=>true, :js_errors=>false, :headers=>{ 'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/XXXXXXXXXXXXX Safari/XXXXXX Vivaldi/XXXXXXXXXX'}})
+    Capybara::Poltergeist::Driver.new(app, {:timeout=>120, :js=>true, :js_errors=>false})
 end
 
 
@@ -33,38 +33,35 @@ module Crawler
       fill_in "user[password]", :with => password
 
       page.all(".wt-ui-button-blue")[0].trigger('click')
-      puts page.all(".wt-ui-button-blue")[0].value
-      page.driver.headers = { "User-Agent" => "Mac Safari" }
 
-      session = Capybara::Session.new(:poltergeist)
       find(".label", :text => "スカウト").trigger("click")
       find("span", :text => "条件で探す").trigger("click")
 
-            # find(".select-box li", :text => "エンジニア").click
-            # find(".select-box li", :text => "1週間以内にログイン").click
-            # find(".select-box li", :text => "関東").click
-            # find(".select-box li", :text => "転職意欲が高い").click
+      # find(".select-box li", :text => "エンジニア").click
+      # find(".select-box li", :text => "1週間以内にログイン").click
+      # find(".select-box li", :text => "関東").click
+      # find(".select-box li", :text => "転職意欲が高い").click
 
-            # find(".select-box li", :text => "エンジニア").trigger("click")
-            # find(".select-box li", :text => "1週間以内にログイン").trigger("click")
-            # find(".select-box li", :text => "関東").trigger("click")
-            # find(".select-box li", :text => "転職意欲が高い").trigger("click")
+      # find(".select-box li", :text => "エンジニア").trigger("click")
+      # find(".select-box li", :text => "1週間以内にログイン").trigger("click")
+      # find(".select-box li", :text => "関東").trigger("click")
+      # find(".select-box li", :text => "転職意欲が高い").trigger("click")
 
-            find(".custom-select option", :text => "エンジニア").trigger("click")
-            find(".custom-select option", :text => "1週間以内にログイン").trigger("click")
-            find(".custom-select option", :text => "関東").trigger("click")
-            find(".custom-select option", :text => "転職意欲が高い").trigger("click")
+      find("#search_occupation_types_ option", :text => "エンジニア").trigger("click")
+      find("#search_activity option", :text => "1週間以内にログイン").trigger("click")
+      find("#search_locations", :text => "関東").trigger("click")
+      find("#search_motivation option", :text => "転職意欲が高い").trigger("click")
 
-            # find(".custom-select option", :text => "エンジニア").click
-            # find(".custom-select option", :text => "1週間以内にログイン").click
-            # find(".custom-select option", :text => "関東").click
-            # find(".custom-select option", :text => "転職意欲が高い").click
+      # find(".custom-select option", :text => "エンジニア").click
+      # find(".custom-select option", :text => "1週間以内にログイン").click
+      # find(".custom-select option", :text => "関東").click
+      # find(".custom-select option", :text => "転職意欲が高い").click
 
 
 
 
       puts page.find("body")['outerHTML'] # htmlタグ出力
-      p URI.parse(current_url).to_s
+      puts current_url
 
     end
   end
