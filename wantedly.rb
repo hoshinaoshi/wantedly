@@ -1,8 +1,6 @@
 require 'capybara'
 require 'capybara/dsl'
 require 'capybara/poltergeist'
-require 'nokogiri'
-require 'open-uri'
 
 Capybara.current_driver = :poltergeist
 
@@ -38,7 +36,7 @@ include Capybara::DSL # 警告が出るが動く
   page.find("#search_activity option", :text => "1週間以内にログイン").trigger("click")
   page.find("#search_locations", :text => "関東").trigger("click")
   page.find("#search_motivation option", :text => "転職意欲が高い").trigger("click")
-  # 今この辺りがうまくいかない
+  # 今この辺りがうまくいかない(クリックして再度読み込む ユーザ情報の取得に失敗しました)
 
   puts page.find("body")['outerHTML'] # htmlタグ出力で確認
   puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
