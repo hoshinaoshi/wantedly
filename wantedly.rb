@@ -36,16 +36,25 @@ module Crawler
 
       page.all(".wt-ui-button-blue")[0].trigger('click')
       puts page.all(".wt-ui-button-blue")[0].value
-    end
-
-    def select#(region, org)
+    # end
+    #
+    # def select#(region, org)
       # 地域と組織の管理画面へ遷移
       page.driver.headers = { "User-Agent" => "Mac Safari" }
 
-      # page.all("div.label")[6].trigger('click')
       session = Capybara::Session.new(:poltergeist)
-      session.visit('https://www.wantedly.com/enterprise/scouts')
-
+      # session.visit('https://www.wantedly.com/enterprise/scouts')
+      # page.all("div.label")[6].trigger('click')
+      find(".label", :text => "スカウト").click
+      find("span", :text => "条件で探す").click
+      find(".select-box li", :text => "エンジニア").click
+      find(".select-box li", :text => "1週間以内にログイン").click
+      find(".select-box li", :text => "関東").click
+      find(".select-box li", :text => "転職意欲が高い").click
+      # find("#search_occupation_types_ option", :text => "エンジニア").trigger("click")
+      # find("#search_activity option", :text => "1週間以内にログイン").trigger("click")
+      # find("#search_locations option", :text => "関東").trigger("click")
+      # find("#search_motivation option", :text => "転職意欲が高い").trigger("click")
 
       # opt = {}
       # opt['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/XXXXXXXXXXXXX Safari/XXXXXX Vivaldi/XXXXXXXXXX'
@@ -56,6 +65,7 @@ module Crawler
 
       puts page.find("body")['outerHTML'] # htmlタグ出力
       p URI.parse(current_url).to_s
+
 
       # puts page.find(".toggle-filter-panel")
       # puts page.all(".user-name")[0].value
@@ -137,5 +147,5 @@ end
 
 crawler = Crawler::Bluemix.new
 crawler.login(ARGV[0], ARGV[1])
-crawler.select#("米国南部", "組織名")
+# crawler.select#("米国南部", "組織名")
 # crawler.report
