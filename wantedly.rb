@@ -18,54 +18,27 @@ Capybara.register_driver :poltergeist do |app|
     Capybara::Poltergeist::Driver.new(app, {:timeout=>120, :js=>true, :js_errors=>false})
 end
 
+include Capybara::DSL # 警告が出るが動く
 
-module Crawler
-  class Wantedly
+  page.driver.headers = { "User-Agent" => "Mac Safari" }
 
-    include Capybara::DSL
+  visit('/user/sign_in')
 
-    def login(username, password)
-      page.driver.headers = { "User-Agent" => "Mac Safari" }
+  fill_in "user[email]", :with => ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
+  fill_in "user[password]", :with => ARGV[1]
 
-      visit('/user/sign_in')
+  page.all(".wt-ui-button-blue")[0].trigger('click')
 
-      fill_in "user[email]", :with => username, match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
-      fill_in "user[password]", :with => password
+  page.find(".label", :text => "スカウト").trigger("click")
 
-      page.all(".wt-ui-button-blue")[0].trigger('click')
+  page.find("span", :text => "条件で探す").trigger("click")
+  # page.find(".toggle-filter-panel").trigger("click") # 上でもよいが一応
 
-      find(".label", :text => "スカウト").trigger("click")
-      find("span", :text => "条件で探す").trigger("click")
+  page.find("#search_occupation_types_ option", :text => "エンジニア").trigger("click")
+  page.find("#search_activity option", :text => "1週間以内にログイン").trigger("click")
+  page.find("#search_locations", :text => "関東").trigger("click")
+  page.find("#search_motivation option", :text => "転職意欲が高い").trigger("click")
+  # 今この辺りがうまくいかない
 
-      # find(".select-box li", :text => "エンジニア").click
-      # find(".select-box li", :text => "1週間以内にログイン").click
-      # find(".select-box li", :text => "関東").click
-      # find(".select-box li", :text => "転職意欲が高い").click
-
-      # find(".select-box li", :text => "エンジニア").trigger("click")
-      # find(".select-box li", :text => "1週間以内にログイン").trigger("click")
-      # find(".select-box li", :text => "関東").trigger("click")
-      # find(".select-box li", :text => "転職意欲が高い").trigger("click")
-
-      find("#search_occupation_types_ option", :text => "エンジニア").trigger("click")
-      find("#search_activity option", :text => "1週間以内にログイン").trigger("click")
-      find("#search_locations", :text => "関東").trigger("click")
-      find("#search_motivation option", :text => "転職意欲が高い").trigger("click")
-
-      # find(".custom-select option", :text => "エンジニア").click
-      # find(".custom-select option", :text => "1週間以内にログイン").click
-      # find(".custom-select option", :text => "関東").click
-      # find(".custom-select option", :text => "転職意欲が高い").click
-
-
-
-
-      puts page.find("body")['outerHTML'] # htmlタグ出力
-      puts current_url
-
-    end
-  end
-end
-
-crawler = Crawler::Wantedly.new
-crawler.login(ARGV[0], ARGV[1])
+  puts page.find("body")['outerHTML'] # htmlタグ出力で確認
+  puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
