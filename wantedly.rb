@@ -20,7 +20,7 @@ end
 
 
 module Crawler
-  class Bluemix
+  class Wantedly
 
     include Capybara::DSL
 
@@ -37,12 +37,21 @@ module Crawler
       page.driver.headers = { "User-Agent" => "Mac Safari" }
 
       session = Capybara::Session.new(:poltergeist)
-      find(".label", :text => "スカウト").click
-      find("span", :text => "条件で探す").click
-      find(".select-box li", :text => "エンジニア").click
-      find(".select-box li", :text => "1週間以内にログイン").click
-      find(".select-box li", :text => "関東").click
-      find(".select-box li", :text => "転職意欲が高い").click
+      find(".label", :text => "スカウト").trigger("click")
+      find("span", :text => "条件で探す").trigger("click")
+      # find(".select-box li", :text => "エンジニア").trigger("click")
+      # find(".select-box li", :text => "1週間以内にログイン").trigger("click")
+      # find(".select-box li", :text => "関東").trigger("click")
+      # find(".select-box li", :text => "転職意欲が高い").trigger("click")
+      find(".custom-select option", :text => "エンジニア").trigger("click")
+      find(".custom-select option", :text => "1週間以内にログイン").trigger("click")
+      find(".custom-select option", :text => "関東").trigger("click")
+      find(".custom-select option", :text => "転職意欲が高い").trigger("click")
+      # find(".custom-select option", :text => "エンジニア").click
+      # find(".custom-select option", :text => "1週間以内にログイン").click
+      # find(".custom-select option", :text => "関東").click
+      # find(".custom-select option", :text => "転職意欲が高い").click
+
 
 
       puts page.find("body")['outerHTML'] # htmlタグ出力
@@ -52,5 +61,5 @@ module Crawler
   end
 end
 
-crawler = Crawler::Bluemix.new
+crawler = Crawler::Wantedly.new
 crawler.login(ARGV[0], ARGV[1])
