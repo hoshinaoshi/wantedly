@@ -29,7 +29,7 @@ module Crawler
 
       visit('/user/sign_in')
 
-      fill_in "user[email]", :with => username, match: :first
+      fill_in "user[email]", :with => username, match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
       fill_in "user[password]", :with => password
 
       page.all(".wt-ui-button-blue")[0].trigger('click')
@@ -39,18 +39,27 @@ module Crawler
       session = Capybara::Session.new(:poltergeist)
       find(".label", :text => "スカウト").trigger("click")
       find("span", :text => "条件で探す").trigger("click")
-      # find(".select-box li", :text => "エンジニア").trigger("click")
-      # find(".select-box li", :text => "1週間以内にログイン").trigger("click")
-      # find(".select-box li", :text => "関東").trigger("click")
-      # find(".select-box li", :text => "転職意欲が高い").trigger("click")
-      find(".custom-select option", :text => "エンジニア").trigger("click")
-      find(".custom-select option", :text => "1週間以内にログイン").trigger("click")
-      find(".custom-select option", :text => "関東").trigger("click")
-      find(".custom-select option", :text => "転職意欲が高い").trigger("click")
-      # find(".custom-select option", :text => "エンジニア").click
-      # find(".custom-select option", :text => "1週間以内にログイン").click
-      # find(".custom-select option", :text => "関東").click
-      # find(".custom-select option", :text => "転職意欲が高い").click
+
+            # find(".select-box li", :text => "エンジニア").click
+            # find(".select-box li", :text => "1週間以内にログイン").click
+            # find(".select-box li", :text => "関東").click
+            # find(".select-box li", :text => "転職意欲が高い").click
+
+            # find(".select-box li", :text => "エンジニア").trigger("click")
+            # find(".select-box li", :text => "1週間以内にログイン").trigger("click")
+            # find(".select-box li", :text => "関東").trigger("click")
+            # find(".select-box li", :text => "転職意欲が高い").trigger("click")
+
+            find(".custom-select option", :text => "エンジニア").trigger("click")
+            find(".custom-select option", :text => "1週間以内にログイン").trigger("click")
+            find(".custom-select option", :text => "関東").trigger("click")
+            find(".custom-select option", :text => "転職意欲が高い").trigger("click")
+
+            # find(".custom-select option", :text => "エンジニア").click
+            # find(".custom-select option", :text => "1週間以内にログイン").click
+            # find(".custom-select option", :text => "関東").click
+            # find(".custom-select option", :text => "転職意欲が高い").click
+
 
 
 
