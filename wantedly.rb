@@ -44,14 +44,11 @@ module Crawler
 
       # page.all("div.label")[6].trigger('click')
       session = Capybara::Session.new(:poltergeist)
+      session.visit('https://www.wantedly.com/enterprise/scouts')
 
 
       # opt = {}
       # opt['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/XXXXXXXXXXXXX Safari/XXXXXX Vivaldi/XXXXXXXXXX'
-
-      url = 'https://www.wantedly.com/enterprise/scouts'
-      
-      session.visit(url)
 
       # visit("/enterprise/scouts")
 
