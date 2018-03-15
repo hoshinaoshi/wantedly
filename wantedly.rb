@@ -1,6 +1,6 @@
-require 'capybara'
-require 'capybara/dsl'
-require 'capybara/poltergeist'
+require "capybara"
+require "capybara/dsl"
+require "capybara/poltergeist"
 
 Capybara.current_driver = :poltergeist
 
@@ -24,10 +24,10 @@ visit('/user/sign_in')
 
 fill_in "user[email]", :with => ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
 fill_in "user[password]", :with => ARGV[1]
+# 引数にメールアドレスとパスワード
 
-page.all(".wt-ui-button-blue")[0].trigger('click')
+page.all(".wt-ui-button-blue")[0].trigger("click")
 puts "Successfully logged in"
-puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
 
 page.find(".label", :text => "スカウト").trigger("click")
 
@@ -38,6 +38,7 @@ page.find("#search_occupation_types_ option", :text => "エンジニア").trigge
 page.find("#search_activity option", :text => "1週間以内にログイン").trigger("click")
 page.find("#search_locations", :text => "関東").trigger("click")
 page.find("#search_motivation option", :text => "転職意欲が高い").trigger("click")
-# 今この辺りがうまくいかない(クリックして再度読み込む ユーザ情報の取得に失敗しました)
 
-puts page.find("body")['outerHTML'] # htmlタグ出力で確認
+sleep(10) # 数秒待たないとユーザ情報の取得に失敗する
+puts page.find("body")["outerHTML"] # htmlタグ出力で確認
+puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
