@@ -40,5 +40,10 @@ page.find("#search_locations", :text => "関東").trigger("click")
 page.find("#search_motivation option", :text => "転職意欲が高い").trigger("click")
 
 sleep(10) # 数秒待たないとユーザ情報の取得に失敗する
+
 puts page.find("body")["outerHTML"] # htmlタグ出力で確認
 puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
+
+page.all(".bookmark-button").each do |button|
+  p button["outerHTML"]
+end
