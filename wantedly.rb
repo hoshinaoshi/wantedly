@@ -50,4 +50,5 @@ puts current_url # 少し間違えるとURLにパラメータが含まれずう�
 
 page.all(".bookmark-button").each do |button|
   p button["outerHTML"] # これだけだと最初の読み込みの10名しか表示されない
+  # 条件で絞り込みできたらクリックさせる
 end
