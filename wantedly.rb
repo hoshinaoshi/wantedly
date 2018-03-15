@@ -26,6 +26,8 @@ fill_in "user[email]", :with => ARGV[0], match: :first # 同様のname属性を�
 fill_in "user[password]", :with => ARGV[1]
 
 page.all(".wt-ui-button-blue")[0].trigger('click')
+puts "Successfully logged in"
+puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
 
 page.find(".label", :text => "スカウト").trigger("click")
 
@@ -39,4 +41,3 @@ page.find("#search_motivation option", :text => "転職意欲が高い").trigger
 # 今この辺りがうまくいかない(クリックして再度読み込む ユーザ情報の取得に失敗しました)
 
 puts page.find("body")['outerHTML'] # htmlタグ出力で確認
-puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
