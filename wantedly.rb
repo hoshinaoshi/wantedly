@@ -19,7 +19,7 @@ end
 include Capybara::DSL # 警告が出るが動く
 
 def condition(selector, text)
-    page.find(selector, :text => text).trigger("click")
+  page.find(selector, :text => text).trigger("click")
   sleep(10) # 待たないとユーザ情報の取得に失敗する
 end
 
