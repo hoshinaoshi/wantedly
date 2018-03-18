@@ -31,6 +31,7 @@ def condition(selector, text)
 end
 
 page.driver.headers = { "User-Agent" => "Mac Safari" }
+page.driver.resize_window(1500, 1000)
 
 visit("/user/sign_in")
 
@@ -50,6 +51,8 @@ condition(".select-box li", "エンジニア")
 condition(".select-box li", "1週間以内にログイン")
 condition(".select-box li", "関東")
 condition(".select-box li", "転職意欲が高い")
+# fill_in "search[age_range]", :with => "18-35"
+# puts find("input#search_age_range").value
 sleep(10) # wait(selector)はここでは意味を成さない ∵id, classは検索条件絞込前後で変化しない
 save_screenshot('~/Downloads/screenshot.png')
 
