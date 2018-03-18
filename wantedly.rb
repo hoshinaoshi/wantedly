@@ -50,8 +50,6 @@ condition(".select-box li", "エンジニア")
 condition(".select-box li", "1週間以内にログイン")
 condition(".select-box li", "関東")
 condition(".select-box li", "転職意欲が高い")
-# fill_in "search[age_range]", :with => "18-35"
-# puts page.find("#search_age_range").value
 sleep(10) # wait(selector)はここでは意味を成さない ∵id, classは検索条件絞込前後で変化しない
 save_screenshot('~/Downloads/screenshot.png')
 
