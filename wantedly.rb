@@ -46,23 +46,21 @@ conditions.each do |condition|
   search(".select-box li", condition)
 end
 
-# 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると非表示になる
-# ∴検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
+# 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
+# ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
-# until all("article.user-profile").count == 5
-#   sleep # 一度に読み込めるユーザ全てを読み込むまでsleep
-# end
-save_screenshot('~/Downloads/screenshot2.png', full: true)
+puts all("article.user-profile").count
 
-for num in 0..9 do # 1ページあたり10ユーザ
-  within(all("article.user-profile")[num]) do
-    if all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i <= 35 &&
-      all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i >= 18
-        # all(".bookmark-button")[num].trigger("click")
-        puts "YESSSSSSSS"
-        puts all(".user-activity span")[1].text.gsub("歳", "").to_i
-    else
-        puts "NOOOOOOOOOOOO"
+sleep until all("article.user-profile").count >= 5 # 一度に読み込めるユーザ5件を読み込むまでsleep
+
+all("article.user-profile").each do
+  for num in 0..9 do # 1ページあたり10ユーザ
+    within(all("article.user-profile")[num]) do
+      if all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i <= 35 &&
+        all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i >= 18
+          all(".bookmark-button")[num].trigger("click")
+      end
     end
+    sleep(rand(10))
   end
 end
