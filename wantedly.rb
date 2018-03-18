@@ -18,9 +18,16 @@ end
 
 include Capybara::DSL # 警告が出るが動く
 
+
+def wait(selector)
+  until has_css?(selector)
+    sleep
+  end
+end
+
 def condition(selector, text)
   page.find(selector, :text => text).trigger("click")
-  sleep(10) # 待たないとユーザ情報の取得に失敗する
+  wait(".bookmark-button")
 end
 
 page.driver.headers = { "User-Agent" => "Mac Safari" }
@@ -29,7 +36,6 @@ visit("/user/sign_in")
 
 fill_in "user[email]", :with => ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
 fill_in "user[password]", :with => ARGV[1]
-# 引数にメールアドレスとパスワード
 
 page.all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
 puts "Successfully logged in"
@@ -37,18 +43,17 @@ puts "Successfully logged in"
 page.find(".label", :text => "スカウト").trigger("click")
 # パラメータつきでURLにvisitすると何故かトップに行くので使わない
 
-condition("span", "条件で探す")
-# page.find(".toggle-filter-panel").trigger("click") # 上でもよいが一応
+condition(".toggle-filter-panel", "条件で探す")
+wait(".open")
 
-condition("#search_occupation_types_ option", "エンジニア")
-condition("#search_activity option", "1週間以内にログイン")
-condition("#search_locations option", "関東")
-condition("#search_motivation option", "転職意欲が高い")
-
-puts page.find("body")["outerHTML"] # htmlタグ出力で確認
-puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
+condition(".select-box li", "エンジニア")
+condition(".select-box li", "1週間以内にログイン")
+condition(".select-box li", "関東")
+condition(".select-box li", "転職意欲が高い")
+sleep(10) # wait(selector)はここでは意味を成さない ∵id, classは検索条件絞込前後で変化しない
+page.save_screenshot('~/Downloads/screenshot.png')
 
 page.all(".bookmark-button").each do |button|
-  p button["outerHTML"] # これだけだと最初の読み込みの10名しか表示されない
+  button["outerHTML"] # これだけだと最初の読み込みの10名しか表示されない
   # 条件で絞り込みできたらクリックさせる
 end
