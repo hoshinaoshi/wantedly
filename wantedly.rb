@@ -48,19 +48,23 @@ search(".toggle-filter-panel", "条件で探す")
 
 conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
 
-puts "accepted the condition"
 conditions.each do |cond|
   search(".select-box li", cond)
 end
 
-fill_in "input#search_age_range", :with => "18-35"
+# fill_in "input#search_age_range", :with => "18-35"
 # puts find("input#search_age_range").value
 # puts find("search[age_range]").value
 sleep(10) # wait(selector)はここでは意味を成さない ∵id, classは検索条件絞込前後で変化しない
 save_screenshot('~/Downloads/screenshot.png')
 
-# puts all("ul.user-activities .user-activity span")[1].gsub("歳", "").to_i
+for num in 0..9 do
+  span = num * 3 + 1
+  if all("ul.user-activities .user-activity span")[span].text.gsub("歳", "").to_i < =35 &&
+    all("ul.user-activities .user-activity span")[span].text.gsub("歳", "").to_i > =18 &&
 
+  end
+end
 # if all("ul.user-activities .user-activity span")[1].gsub("歳", "").to_i <= 35
 #   all(".bookmark-button").each do |button|
 #     puts "YESSSSSSSS"
