@@ -26,7 +26,7 @@ def wait(selector)
 end
 
 def condition(selector, text)
-  page.find(selector, :text => text).trigger("click")
+  find(selector, :text => text).trigger("click")
   wait(".bookmark-button")
 end
 
@@ -37,10 +37,10 @@ visit("/user/sign_in")
 fill_in "user[email]", :with => ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
 fill_in "user[password]", :with => ARGV[1]
 
-page.all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
+all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
 puts "Successfully logged in"
 
-page.find(".label", :text => "スカウト").trigger("click")
+find(".label", :text => "スカウト").trigger("click")
 # パラメータつきでURLにvisitすると何故かトップに行くので使わない
 
 condition(".toggle-filter-panel", "条件で探す")
@@ -50,10 +50,12 @@ condition(".select-box li", "エンジニア")
 condition(".select-box li", "1週間以内にログイン")
 condition(".select-box li", "関東")
 condition(".select-box li", "転職意欲が高い")
+# fill_in "search[age_range]", :with => "18-35"
+# puts page.find("#search_age_range").value
 sleep(10) # wait(selector)はここでは意味を成さない ∵id, classは検索条件絞込前後で変化しない
-page.save_screenshot('~/Downloads/screenshot.png')
+save_screenshot('~/Downloads/screenshot.png')
 
-page.all(".bookmark-button").each do |button|
+all(".bookmark-button").each do |button|
   button["outerHTML"] # これだけだと最初の読み込みの10名しか表示されない
   # 条件で絞り込みできたらクリックさせる
 end
