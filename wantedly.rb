@@ -45,18 +45,28 @@ find(".label", :text => "スカウト").trigger("click")
 # パラメータつきでURLにvisitすると何故かトップに行くので使わない
 
 condition(".toggle-filter-panel", "条件で探す")
-wait(".open")
 
-condition(".select-box li", "エンジニア")
-condition(".select-box li", "1週間以内にログイン")
-condition(".select-box li", "関東")
-condition(".select-box li", "転職意欲が高い")
-# fill_in "search[age_range]", :with => "18-35"
+conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
+
+conditions.each do |cond|
+  condition(".select-box li", cond)
+end
+puts "accepted the condition"
+
+fill_in "input#search_age_range", :with => "18-35"
 # puts find("input#search_age_range").value
+# puts find("search[age_range]").value
 sleep(10) # wait(selector)はここでは意味を成さない ∵id, classは検索条件絞込前後で変化しない
 save_screenshot('~/Downloads/screenshot.png')
 
-all(".bookmark-button").each do |button|
-  button["outerHTML"] # これだけだと最初の読み込みの10名しか表示されない
-  # 条件で絞り込みできたらクリックさせる
-end
+# puts all("ul.user-activities .user-activity span")[1].gsub("歳", "").to_i
+
+# if all("ul.user-activities .user-activity span")[1].gsub("歳", "").to_i <= 35
+#   all(".bookmark-button").each do |button|
+#     puts "YESSSSSSSS"
+#     # button # これだけだと最初の読み込みの10名しか表示されない
+#     # 条件で絞り込みできたらクリックさせる
+#   end
+# else
+#   puts "NOOOO"
+# end
