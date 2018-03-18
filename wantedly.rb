@@ -61,6 +61,6 @@ all("article.user-profile").each do
           all(".bookmark-button")[num].trigger("click")
       end
     end
-    sleep(rand(10))
+    sleep(rand(50))
   end
 end
