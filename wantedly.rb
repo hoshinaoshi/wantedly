@@ -25,7 +25,7 @@ def wait(selector)
   end
 end
 
-def condition(selector, text)
+def search(selector, text)
   find(selector, :text => text).trigger("click")
   wait(".bookmark-button")
 end
@@ -44,14 +44,14 @@ puts "Successfully logged in"
 find(".label", :text => "スカウト").trigger("click")
 # パラメータつきでURLにvisitすると何故かトップに行くので使わない
 
-condition(".toggle-filter-panel", "条件で探す")
+search(".toggle-filter-panel", "条件で探す")
 
 conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
 
-conditions.each do |cond|
-  condition(".select-box li", cond)
-end
 puts "accepted the condition"
+conditions.each do |cond|
+  search(".select-box li", cond)
+end
 
 fill_in "input#search_age_range", :with => "18-35"
 # puts find("input#search_age_range").value
