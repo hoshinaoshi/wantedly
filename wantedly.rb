@@ -19,19 +19,13 @@ end
 include Capybara::DSL # 警告が出るが動く
 
 
-def wait(selector)
-  until has_css?(selector)
-    sleep
-  end
-end
-
 def search(selector, text)
   find(selector, :text => text).trigger("click")
-  wait(".bookmark-button")
+  sleep until has_css?(".bookmark-button")
 end
 
 page.driver.headers = { "User-Agent" => "Mac Safari" }
-page.driver.resize_window(1500, 1000)
+page.driver.resize_window(1500, 1000) # スクショ用
 
 visit("/user/sign_in")
 
@@ -48,29 +42,27 @@ search(".toggle-filter-panel", "条件で探す")
 
 conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
 
-conditions.each do |cond|
-  search(".select-box li", cond)
+conditions.each do |condition|
+  search(".select-box li", condition)
 end
 
-# fill_in "input#search_age_range", :with => "18-35"
-# puts find("input#search_age_range").value
-# puts find("search[age_range]").value
-sleep(10) # wait(selector)はここでは意味を成さない ∵id, classは検索条件絞込前後で変化しない
-save_screenshot('~/Downloads/screenshot.png')
+# 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると非表示になる
+# ∴検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
-for num in 0..9 do
-  span = num * 3 + 1
-  if all("ul.user-activities .user-activity span")[span].text.gsub("歳", "").to_i < =35 &&
-    all("ul.user-activities .user-activity span")[span].text.gsub("歳", "").to_i > =18 &&
+# until all("article.user-profile").count == 5
+#   sleep # 一度に読み込めるユーザ全てを読み込むまでsleep
+# end
+save_screenshot('~/Downloads/screenshot2.png', full: true)
 
+for num in 0..9 do # 1ページあたり10ユーザ
+  within(all("article.user-profile")[num]) do
+    if all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i <= 35 &&
+      all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i >= 18
+        # all(".bookmark-button")[num].trigger("click")
+        puts "YESSSSSSSS"
+        puts all(".user-activity span")[1].text.gsub("歳", "").to_i
+    else
+        puts "NOOOOOOOOOOOO"
+    end
   end
 end
-# if all("ul.user-activities .user-activity span")[1].gsub("歳", "").to_i <= 35
-#   all(".bookmark-button").each do |button|
-#     puts "YESSSSSSSS"
-#     # button # これだけだと最初の読み込みの10名しか表示されない
-#     # 条件で絞り込みできたらクリックさせる
-#   end
-# else
-#   puts "NOOOO"
-# end
