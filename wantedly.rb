@@ -49,16 +49,17 @@ end
 # 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
-puts all("article.user-profile").count
-
 sleep until all("article.user-profile").count >= 5 # 一度に読み込めるユーザ5件を読み込むまでsleep
+puts "aaa"
 
 all("article.user-profile").each do
   for num in 0..9 do # 1ページあたり10ユーザ
     within(all("article.user-profile")[num]) do
       if all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i <= 35 &&
         all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i >= 18
-          all(".bookmark-button")[num].trigger("click")
+        puts "aaaaaaaaaaaaaaa"
+          find(".bookmark-button").trigger("click")
+          all(".select-tag-section-body-tag", :text => "エンジニア")[0].trigger("click")
       end
     end
     sleep(rand(50))
