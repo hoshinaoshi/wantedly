@@ -50,14 +50,12 @@ end
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
 sleep until all("article.user-profile").count >= 5 # 一度に読み込めるユーザ5件を読み込むまでsleep
-puts "aaa"
 
 all("article.user-profile").each do
   for num in 0..9 do # 1ページあたり10ユーザ
     within(all("article.user-profile")[num]) do
       if all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i <= 35 &&
         all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i >= 18
-        puts "aaaaaaaaaaaaaaa"
           find(".bookmark-button").trigger("click")
           all(".select-tag-section-body-tag", :text => "エンジニア")[0].trigger("click")
       end
