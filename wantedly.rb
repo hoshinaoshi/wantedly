@@ -13,42 +13,56 @@ Capybara.configure do |config|
 end
 
 Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, {:timeout=>120, :js=>true, :js_errors=>false})
+  Capybara::Poltergeist::Driver.new(app, {timeout: 120, js: true, js_errors: false})
 end
 
 include Capybara::DSL # 警告が出るが動く
 
-def condition(selector, text)
-  page.find(selector, :text => text).trigger("click")
-  sleep(10) # 待たないとユーザ情報の取得に失敗する
+
+def set_condition(selector, text)
+  find(selector, text: text).trigger("click")
+  # ブクマボタンの表示までsleepさせていたが、clickが早すぎると条件絞込後ユーザ一覧を読み込む前のブクマボタンの存在を認識してしまうため、
+  # ここではsleepしないことにした
 end
 
-page.driver.headers = { "User-Agent" => "Mac Safari" }
+def is_applicable?
+  age = all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i
+  age.between?(18, 35)
+end
+
+page.driver.headers = { "User-Agent": "Mac Safari" }
+page.driver.resize_window(1500, 1000) # スクショ用
 
 visit("/user/sign_in")
 
-fill_in "user[email]", :with => ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
-fill_in "user[password]", :with => ARGV[1]
-# 引数にメールアドレスとパスワード
+fill_in "user[email]", with: ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
+fill_in "user[password]", with: ARGV[1]
 
-page.all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
+all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
 puts "Successfully logged in"
 
-page.find(".label", :text => "スカウト").trigger("click")
-# パラメータつきでURLにvisitすると何故かトップに行くので使わない
+find(".label", text: "スカウト").trigger("click") # パラメータつきでURLにvisitすると何故かトップに行くので使わない
 
-condition("span", "条件で探す")
-# page.find(".toggle-filter-panel").trigger("click") # 上でもよいが一応
+set_condition(".toggle-filter-panel", "条件で探す")
 
-condition("#search_occupation_types_ option", "エンジニア")
-condition("#search_activity option", "1週間以内にログイン")
-condition("#search_locations option", "関東")
-condition("#search_motivation option", "転職意欲が高い")
+conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
 
-puts page.find("body")["outerHTML"] # htmlタグ出力で確認
-puts current_url # 少し間違えるとURLにパラメータが含まれずうまくいかないことがあるのでURL目視確認
+conditions.each do |condition|
+  set_condition(".select-box li", condition)
+end
 
-page.all(".bookmark-button").each do |button|
-  p button["outerHTML"] # これだけだと最初の読み込みの10名しか表示されない
-  # 条件で絞り込みできたらクリックさせる
+sleep(5) # 各条件指定時にsleepしない代わりにここでsleepして、ユーザ一覧を読み込む
+
+# 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
+# ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
+
+all("article.user-profile").each do
+  for num in 0..9 do # 1ページあたり10ユーザ
+    within(all("article.user-profile")[num]) do
+      next unless is_applicable?
+      find(".bookmark-button").trigger("click")
+      all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+    end
+    sleep(rand(50))
+  end
 end
