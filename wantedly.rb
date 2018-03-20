@@ -26,12 +26,8 @@ def set_condition(selector, text)
 end
 
 def is_applicable?
-  if all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i <= 35 &&
-    all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i >= 18  #各ユーザの公開年齢
-    return true
-  else
-    return false
-  end
+  age = all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i
+  age.between?(18, 35)
 end
 
 page.driver.headers = { "User-Agent": "Mac Safari" }
