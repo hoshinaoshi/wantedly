@@ -1,6 +1,7 @@
 require "capybara"
 require "capybara/dsl"
 require "capybara/poltergeist"
+require "csv"
 
 Capybara.current_driver = :poltergeist
 
@@ -8,7 +9,7 @@ Capybara.configure do |config|
   config.run_server = false
   config.javascript_driver = :poltergeist
   config.app_host = "https://www.wantedly.com"
-  config.default_max_wait_time = 60
+  config.default_max_wait_time = 10
   config.ignore_hidden_elements = false
 end
 
@@ -59,9 +60,22 @@ sleep(5) # 各条件指定時にsleepしない代わりにここでsleepして�
 all("article.user-profile").each do
   for num in 0..9 do # 1ページあたり10ユーザ
     within(all("article.user-profile")[num]) do
-      next unless is_applicable?
-      find(".bookmark-button").trigger("click")
-      all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+      next unless is_applicable? # 36歳以上は処理を飛ばす
+      data = CSV.read("universities.csv").flatten # csvデータが1行だが2次元配列になってしまっているため
+      all(".clickable-name").each do |span|
+        # 学歴欄にユニークなidやある程度ユニークなclassが存在しないため、「大学」という文字列が含まれる.clickable-name総当たりで調べる
+        span_content = span.text
+        if span_content.include?("大学") # 最終学歴が大学であれば
+          univ = span_content
+          if data.include?(univ)
+            find(".BookmarkButton--base").trigger("click") # お気に入りリストに追加
+            all("BookmarkTagPanelTag--base", text: "エンジニア")[0].trigger("click")
+            p "ADDED " + find("a.user-name").text + " " + univ + " " + all("ul.user-activities .user-activity span")[1].text
+          else
+            p "DIDNT ADD " + find("a.user-name").text + " " + univ + " " + all("ul.user-activities .user-activity span")[1].text
+          end
+        end
+      end
     end
     sleep(rand(50))
   end
