@@ -58,7 +58,7 @@ sleep(5) # 各条件指定時にsleepしない代わりにここでsleepして�
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
 all("article.user-profile").each do
-  for num in 0..9 do # 1ページあたり10ユーザ
+  for num in 0..9 do
     within(all("article.user-profile")[num]) do
       next unless is_applicable? # 36歳以上は処理を飛ばす
       data = CSV.read("universities.csv").flatten # csvデータが1行だが2次元配列になってしまっているため
@@ -67,16 +67,18 @@ all("article.user-profile").each do
         span_content = span.text
         if span_content.include?("大学") # 最終学歴が大学であれば
           univ = span_content
+          user_name = find("a.user-name").text
+          user_age = all("ul.user-activities .user-activity span")[1].text
           if data.include?(univ)
-            find(".BookmarkButton--base").trigger("click") # お気に入りリストに追加
-            all("BookmarkTagPanelTag--base", text: "エンジニア")[0].trigger("click")
-            p "ADDED " + find("a.user-name").text + " " + univ + " " + all("ul.user-activities .user-activity span")[1].text
+            find(".bookmark-button").trigger("click") # お気に入りリストに追加
+            all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+            puts "ADDED " + user_name + " " + univ + " " + user_age
           else
-            p "DIDNT ADD " + find("a.user-name").text + " " + univ + " " + all("ul.user-activities .user-activity span")[1].text
+            puts "DIDNT ADD " + user_name + " " + univ + " " + user_age
           end
         end
       end
     end
-    sleep(rand(50))
+    sleep(rand(5))
   end
 end
