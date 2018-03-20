@@ -79,6 +79,6 @@ all("article.user-profile").each do
         end
       end
     end
-    sleep(rand(5))
+    sleep(rand(50))
   end
 end
