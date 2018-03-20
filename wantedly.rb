@@ -60,15 +60,12 @@ sleep(5) # 各条件指定時にsleepしない代わりにここでsleepして�
 # 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
-sleep until all("article.user-profile").count >= 5 # 一度に読み込めるユーザ5件を読み込むまでsleep
-
 all("article.user-profile").each do
   for num in 0..9 do # 1ページあたり10ユーザ
     within(all("article.user-profile")[num]) do
-      if is_applicable?
-        find(".bookmark-button").trigger("click")
-        all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
-      end
+      next unless is_applicable?
+      find(".bookmark-button").trigger("click")
+      all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
     end
     sleep(rand(50))
   end
