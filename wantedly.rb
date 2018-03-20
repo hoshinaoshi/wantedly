@@ -67,11 +67,9 @@ pages.times do
         data = CSV.read("universities.csv").flatten # csvデータが1行だが2次元配列になってしまっているため
         all(".clickable-name").each do |span|
           # 学歴欄にユニークなidやある程度ユニークなclassが存在しないため、「大学」という文字列が含まれる.clickable-name総当たりで調べる
-          span_content = span.text
+          span_content = span.text # これだと学部名が付いている場合にそれを大学だと認識してくれない
           if span_content.end_with?("大学") # 「最終学歴が大学であれば」。大学院などもあり得るので.include?ではダメ
             # 大学名を2つ書いている人はどうしようもない…
-            # 大学名を英語表記で書いている場合や外国大学の場合、またデータ取得元にそもそも載っていない場合、切り捨ててしまう。
-            # （切り捨てたユーザをのちに採用担当者が改めて目にする機会があるのであればさほど問題ではないが、「英語表記の大学or海外大学orデジハリなど新しい大学 を考慮しないことで良い候補者を取り逃がしてしまう」可能性は、「学歴フィルタをかけることにより学歴がない逸材を切り捨ててしまう」可能性よりももっと高いだろうから、問題である。）
             univ = span_content
             user_name = find("a.user-name").text
             user_age = all("ul.user-activities .user-activity span")[1].text
