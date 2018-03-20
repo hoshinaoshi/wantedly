@@ -52,33 +52,36 @@ conditions.each do |condition|
   set_condition(".select-box li", condition)
 end
 
-sleep(5) # 各条件指定時にsleepしない代わりにここでsleepして、ユーザ一覧を読み込む
+sleep(10) # 各条件指定時にsleepしない代わりにここでsleepして、ユーザ一覧を読み込む
 
 # 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
+puts all("article.user-profile").count
+page.save_screenshot("~/Downloads/2.png", full: true)
 
-all("article.user-profile").each do
-  for num in 0..9 do
-    within(all("article.user-profile")[num]) do
-      next unless is_applicable? # 36歳以上は処理を飛ばす
-      data = CSV.read("universities.csv").flatten # csvデータが1行だが2次元配列になってしまっているため
-      all(".clickable-name").each do |span|
-        # 学歴欄にユニークなidやある程度ユニークなclassが存在しないため、「大学」という文字列が含まれる.clickable-name総当たりで調べる
-        span_content = span.text
-        if span_content.include?("大学") # 最終学歴が大学であれば
-          univ = span_content
-          user_name = find("a.user-name").text
-          user_age = all("ul.user-activities .user-activity span")[1].text
-          if data.include?(univ)
-            find(".bookmark-button").trigger("click") # お気に入りリストに追加
-            all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
-            puts "ADDED " + user_name + " " + univ + " " + user_age
-          else
-            puts "DIDNT ADD " + user_name + " " + univ + " " + user_age
-          end
+for num in 0..9 do
+  within(all("article.user-profile")[num]) do
+    next unless is_applicable? # 36歳以上は処理を飛ばす
+    puts find(".user-name").text
+    data = CSV.read("universities.csv").flatten # csvデータが1行だが2次元配列になってしまっているため
+    all(".clickable-name").each do |span|
+      # 学歴欄にユニークなidやある程度ユニークなclassが存在しないため、「大学」という文字列が含まれる.clickable-name総当たりで調べる
+      span_content = span.text
+      if span_content.include?("大学") # 「最終学歴が大学であれば」
+        # 大学名を英語表記で書いている場合や外国大学の場合、またデータ取得元にそもそも載っていない場合、切り捨ててしまう。
+        # （切り捨てたユーザをのちに採用担当者が改めて目にする機会があるのであればさほど問題ではないが、「英語表記の大学or海外大学orデジハリなど新しい大学 を考慮しないことで良い候補者を取り逃がしてしまう」可能性は、「学歴フィルタをかけることにより学歴がない逸材を切り捨ててしまう」可能性よりももっと高いだろうから、問題である。）
+        univ = span_content
+        user_name = find("a.user-name").text
+        user_age = all("ul.user-activities .user-activity span")[1].text
+        if data.include?(univ)
+          # find(".bookmark-button").trigger("click") # お気に入りリストに追加
+          # all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+          puts "ADDED " + user_name + " " + univ + " " + user_age
+        else
+          puts "DIDNT ADD " + user_name + " " + univ + " " + user_age
         end
       end
     end
-    sleep(rand(5))
   end
+  sleep(rand(5))
 end
