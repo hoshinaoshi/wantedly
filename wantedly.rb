@@ -70,7 +70,7 @@ pages.times do
         all(".clickable-name").each do |span|
           # 学歴欄にユニークなidやある程度ユニークなclassが存在しないため、「大学」という文字列が含まれる.clickable-name総当たりで調べる
           span_content = span.text # これだと学部名が付いている場合にそれを大学だと認識してくれない
-          if span_content.end_with?("大学") # 「最終学歴が大学であれば」。大学院などもあり得るので.include?ではダメ
+          if span_content.end_with? ("大学") # 「最終学歴が大学であれば」。大学院などもあり得るので.include?ではダメ
             # 大学名を2つ書いている人はどうしようもない…
             university = span_content
             user_name = find("a.user-name").text
