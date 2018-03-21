@@ -60,6 +60,8 @@ sleep(5) # 各条件指定時にsleepしない代わりにここでsleepして�
 waitings = find(".hits").text.to_i # スカウト待ち人数
 pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
 
+page.save_screenshot("~/Downloads/1.png", full: true)
+
 pages.times do
   for num in 0..9 do
     within(all("article.user-profile")[num]) do
@@ -70,15 +72,15 @@ pages.times do
           span_content = span.text # これだと学部名が付いている場合にそれを大学だと認識してくれない
           if span_content.end_with?("大学") # 「最終学歴が大学であれば」。大学院などもあり得るので.include?ではダメ
             # 大学名を2つ書いている人はどうしようもない…
-            univ = span_content
+            university = span_content
             user_name = find("a.user-name").text
             user_age = all("ul.user-activities .user-activity span")[1].text
-            if data.include?(univ)
-              find(".bookmark-button").trigger("click") # お気に入りリストに追加
-              all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
-              puts "ADDED " + user_name + " " + univ + " " + user_age
+            if data.select {| univ | university.include?(univ) }.empty?
+              puts "DIDNT ADD " + user_name + " " + university + " " + user_age
             else
-              puts "DIDNT ADD " + user_name + " " + univ + " " + user_age
+              # find(".bookmark-button").trigger("click") # お気に入りリストに追加
+              # all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+              puts "ADDED " + user_name + " " + university + " " + user_age
             end
           end
         end
@@ -86,7 +88,7 @@ pages.times do
         puts "OVER 35: " + find(".user-name").text
       end
     end
-    sleep(rand(50))
+    sleep(rand(5))
   end
   visit current_path
   sleep(10)
