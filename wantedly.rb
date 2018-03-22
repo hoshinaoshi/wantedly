@@ -66,7 +66,7 @@ pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち1
 pages.times do
   for num in 0..9 do
     within(all("article.user-profile")[num]) do
-      if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∴ in 0..9)
+      if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
         data = CSV.read("universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
         # all(".clickable-name").each do |span|
           # 学歴欄にユニークなidやある程度ユニークなclassが存在しないため、「大学」という文字列が含まれる.clickable-name総当たりで調べる
