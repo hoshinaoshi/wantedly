@@ -23,8 +23,6 @@ include Capybara::DSL # 警告が出るが動く
 
 def set_condition(selector, text)
   find(selector, text: text).trigger("click")
-  # ブクマボタンの表示までsleepさせていたが、clickが早すぎると条件絞込後ユーザ一覧を読み込む前のブクマボタンの存在を認識してしまうため、
-  # ここではsleepしないことにした
 end
 
 def is_applicable?
@@ -61,11 +59,8 @@ sleep(5) # 各条件指定時にsleepしない代わりにここでsleepして�
 waitings = find(".hits").text.to_i # スカウト待ち人数
 pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
 
-# binding.pry
-
 pages.times do
-  for num in 0..9 do
-    save_screenshot("#{num}.png", full: true)
+  for num in 0..9 do # 一回のロードにつき10名
     within(all("article.user-profile")[num]) do
       if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
         data = CSV.read("universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
@@ -75,25 +70,36 @@ pages.times do
         user_age = all("ul.user-activities .user-activity span")[1].text
 
         span_contents.each do |s|
+
           if s.text.include?("大学") || s.text.include?("University") # 最終学歴が大学・大学院であれば
             university = s.text # 出身大学名
-            if data.select {| univ | university.include?(univ) }.empty?
+            if data.select {| univ | university.include?(univ) }.empty? # univはcsv内の大学名
               puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
             else
               # find(".bookmark-button").trigger("click") # お気に入りリストに追加
               # all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
               puts "追加した: " + user_name + " " + university + " " + user_age
             end
-          else
+          else # .clickable-name の中身が大学やUniversityではない
             puts user_name + " " + user_age + " :大卒ではないか、あるいはこの要素が大卒者の職歴に関するものである"
+            # .clickable-name で職歴なども取って来ざるを得ないためこうなる
+            # putsの回数は、.clickable-name がついた要素の個数に依存する
           end
+          # 大学名を2回書いてしまう人には対処できないが、さすがにそんな人はなかなかいないので無視して良いかも
+
         end
+
       else
         puts "35歳以上: " + user_name
       end
+
     end
+
     sleep(rand(50))
+
   end
-  visit current_path
+
+  visit current_path # reload
   sleep(10)
+
 end
