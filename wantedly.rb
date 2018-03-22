@@ -65,41 +65,34 @@ pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち1
 
 pages.times do
   for num in 0..9 do
+    save_screenshot("#{num}.png", full: true)
     within(all("article.user-profile")[num]) do
       if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
         data = CSV.read("universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
-        # all(".clickable-name").each do |span|
-          # 学歴欄にユニークなidやある程度ユニークなclassが存在しないため、「大学」という文字列が含まれる.clickable-name総当たりで調べる
-          span_contents = all(".name .clickable-name")
-          # binding.pry
-          # span_contents.each do |s|
-          #   puts s.text
-          # end
-          univ = span_contents.find{ | u | u.text.include?("大学") && u.text.length < 15 } # 最初にマッチするものつまり最終学歴が大学以上
-          puts "aaaaaaaaaa" + univ.text
-          # span_content = span.text # これだと学部名が付いている場合にそれを大学だと認識してくれない
-          # 改めて見ていて気づいたが、以下の条件分岐ですでにendwithとしてしまっているので、data.selectとしても意味なかった感…。
 
-          # if span_content.end_with? ("大学") || span_content.end_with? ("University")
-          # # 「最終学歴が大学であれば」。大学院などもあり得るので.include?ではダメ
-          #   # 大学名を2つ書いている人はどうしようもない…
-          #   university = span_content
-          #   user_name = find("a.user-name").text
-          #   user_age = all("ul.user-activities .user-activity span")[1].text
-          #   if data.select {| univ | university.include?(univ) }.empty?
-          #     puts "DIDNT ADD " + user_name + " " + university + " " + user_age
-          #   else
-          #     # find(".bookmark-button").trigger("click") # お気に入りリストに追加
-          #     # all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
-          #     puts "ADDED " + user_name + " " + university + " " + user_age
-          #   end
-          # end
-        # end
+        span_contents = all(".name .clickable-name")
+        user_name = find("a.user-name").text
+        user_age = all("ul.user-activities .user-activity span")[1].text
+
+        span_contents.each do |s|
+          if s.text.include?("大学") || s.text.include?("University") # 最終学歴が大学・大学院であれば
+            university = s.text # 出身大学名
+            if data.select {| univ | university.include?(univ) }.empty?
+              puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
+            else
+              # find(".bookmark-button").trigger("click") # お気に入りリストに追加
+              # all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+              puts "追加した: " + user_name + " " + university + " " + user_age
+            end
+          else
+            puts user_name + " " + user_age + " :大卒ではないか、あるいはこの要素が大卒者の職歴に関するものである"
+          end
+        end
       else
-        puts "OVER 35: " + find(".user-name").text
+        puts "35歳以上: " + user_name
       end
     end
-    sleep(rand(5))
+    sleep(rand(50))
   end
   visit current_path
   sleep(10)
