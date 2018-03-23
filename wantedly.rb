@@ -75,9 +75,10 @@ pages.times do
             university = s.text # 出身大学名
             if data.select {| univ | university.include?(univ) }.empty? # univはcsv内の大学名
               puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
+              # puts university
             else
-              find(".bookmark-button").trigger("click") # お気に入りリストに追加
-              all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+              # find(".bookmark-button").trigger("click") # お気に入りリストに追加
+              # all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
               puts "追加した: " + user_name + " " + university + " " + user_age
             end
           else # .clickable-name の中身が大学やUniversityではない
@@ -86,12 +87,13 @@ pages.times do
             # putsの回数は、.clickable-name がついた要素の個数に依存する
           end
           # 院卒の人は必然的に大卒(なはず)なので、処理がダブってしまいお気に入り登録できなくなるかも
+          # 大学付属の高校まで取ってきてしまうのも問題
           # 大学名を2回書いてしまう人には対処できないが、さすがにそんな人はなかなかいないので無視して良いかも
 
         end
 
       else
-        puts "35歳以上: " + user_name
+        # puts "35歳以上: " + user_name
       end
 
     end
