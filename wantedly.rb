@@ -75,10 +75,9 @@ pages.times do
             university = s.text # 出身大学名
             if data.select {| univ | university.include?(univ) }.empty? # univはcsv内の大学名
               puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
-              # puts university
             else
-              # find(".bookmark-button").trigger("click") # お気に入りリストに追加
-              # all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+              find(".bookmark-button").trigger("click") # お気に入りリストに追加
+              find(".select-tag-section-body-tag", text: "エンジニア").trigger("click")
               puts "追加した: " + user_name + " " + university + " " + user_age
             end
           else # .clickable-name の中身が大学やUniversityではない
@@ -93,7 +92,7 @@ pages.times do
         end
 
       else
-        # puts "35歳以上: " + user_name
+        puts "35歳以上: " + user_name
       end
 
     end
@@ -102,7 +101,9 @@ pages.times do
 
   end
 
-  visit current_path # reload
+  # execute_script("window.scrollBy(0,20000);") # ユーザをもっと読み込む
+  # puts all("article.user-profile").count
+  # visit current_path # reload
   sleep(10)
 
 end
