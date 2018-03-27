@@ -130,7 +130,8 @@ pages.times do
 
   end
 
-  visit current_path # reload
+  visit current_url # reload
   sleep(10)
+  puts current_url
 
 end
