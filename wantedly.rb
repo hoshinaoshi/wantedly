@@ -32,11 +32,13 @@ end
 
 def bookmark
   find(".bookmark-button").trigger("click") if find(".bookmark-button")[:class] == "bookmark-button" # 未ブクマであれば
+  sleep(0.5) # wait
 end
 
 def add_non_fav
-  find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click") if
-    find(".select-tag-section-body-tag", text: "_エンジニア")[:class] == "select-tag-section-body-tag" # グループをselectedしてなければ
+  if find(".select-tag-section-body-tag", text: "_エンジニア")[:class] == "select-tag-section-body-tag"
+    find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
+  end
 end
 
 page.driver.headers = { "User-Agent": "Mac Safari" }
@@ -71,27 +73,32 @@ pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち1
 pages.times do
   for num in 0..9 do # 一回のロードにつき10名
     within(all("article.user-profile")[num]) do
+      span_contents = all(".name .clickable-name")
+      user_name = find("a.user-name").text
+      user_age = all("ul.user-activities .user-activity span")[1].text
+
       if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
         data = CSV.read("universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
 
-        span_contents = all(".name .clickable-name")
-        user_name = find("a.user-name").text
-        user_age = all("ul.user-activities .user-activity span")[1].text
 
         span_contents.each do |s|
 
-          if s.text.include?("大学") && ( s.text.include?("高校") == false || s.text.include?("高等学校") == false ) or # 大学付属の高校を除く処理
-            s.text.include?("University")                # 最終学歴が大学・大学院であれば
+          if s.text.include?("大学") && s.text.include?("高校") == false && s.text.include?("高等学校") == false && s.text.include?("院") == false or
+             s.text.include?("University") # 大学付属高校や大学院ではない
               university = s.text # 出身大学名
-              if data.select {| univ | university.include?(univ) }.empty? # univはcsv内の大学名
+              if data.select {| univ | university.include?(univ) }.empty? == false # univはcsv内の大学名
+                # if ~~~ empty? で_エンジニアグループに追加すると、追加すべき人を追加し損ねてしまうため、if ~~~ empty? == false でエンジニアグループに追加
+                bookmark
+                if all(".select-tag-section-body-tag", text: "エンジニア")[0][:class] == "select-tag-section-body-tag"
+                  all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+                end
+                puts find(".select-tag-section-body-tag", text: "_エンジニア")[:class]
+                puts all(".select-tag-section-body-tag", text: "エンジニア")[0][:class]
+                puts "追加した: " + user_name + " " + university + " " + user_age
+              else
                 bookmark
                 add_non_fav
                 puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
-              else
-                bookmark
-                all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click") if
-                  all(".select-tag-section-body-tag", text: "エンジニア")[0][:class] == "select-tag-section-body-tag" # グループをselectedしてなければ
-                puts "追加した: " + user_name + " " + university + " " + user_age
               end
           else # .clickable-name の中身が大学やUniversityではない
             bookmark
@@ -107,12 +114,14 @@ pages.times do
         end
 
       else
-        find(".bookmark-button").trigger("click") # お気に入りリストに追加
-        add_non_fav
-        #puts "36歳以上: " + user_name
+        span_contents.each do |s|
+          bookmark
+          add_non_fav
+        end
+        puts "36歳以上: " + user_name
       end
 
-    end
+    end # within
 
     sleep(rand(30))
 
