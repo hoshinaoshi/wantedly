@@ -71,17 +71,18 @@ pages.times do
 
         span_contents.each do |s|
 
-          if s.text.include?("大学") || s.text.include?("University") # 最終学歴が大学・大学院であれば
-            university = s.text # 出身大学名
-            if data.select {| univ | university.include?(univ) }.empty? # univはcsv内の大学名
-              find(".bookmark-button").trigger("click") # お気に入りリストに追加
-              find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
-              puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
-            else
-              find(".bookmark-button").trigger("click") # お気に入りリストに追加
-              find(".select-tag-section-body-tag", text: "エンジニア").trigger("click")
-              puts "追加した: " + user_name + " " + university + " " + user_age
-            end
+          if s.text.include?("大学") && ( s.text.include?("高校") == false || s.text.include?("高等学校") == false ) or # 大学付属の高校を除く処理
+            s.text.include?("University")                # 最終学歴が大学・大学院であれば
+              university = s.text # 出身大学名
+              if data.select {| univ | university.include?(univ) }.empty? # univはcsv内の大学名
+                find(".bookmark-button").trigger("click") # お気に入りリストに追加
+                find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
+                puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
+              else
+                find(".bookmark-button").trigger("click") # お気に入りリストに追加
+                find(".select-tag-section-body-tag", text: "エンジニア").trigger("click")
+                puts "追加した: " + user_name + " " + university + " " + user_age
+              end
           else # .clickable-name の中身が大学やUniversityではない
             find(".bookmark-button").trigger("click") # お気に入りリストに追加
             find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
