@@ -75,7 +75,7 @@ pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち1
 CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学
 
   # pages.times do
-  3.times do
+  1.times do
     for num in 0..9 do # 一回のロードにつき10名
       within(all("article.user-profile")[num]) do
         span_contents = all(".name .clickable-name")
@@ -143,14 +143,16 @@ end
 
 data = []
 
-CSV.read("users_universities.csv", encoding: "Shift_JIS:UTF-8").flatten.uniq.each do |a|
+CSV.read("users_universities.csv").flatten.uniq.each do |a|
   data << a # ユーザの卒業大学をuniqueでdataに入れる
 end
 
-# new_csv = CSV.open("users_universities_o.csv", "w", encoding: "Shift_JIS:UTF-8") # 初回実行時
-# new_csv << [] # 初回実行時
-
-new_csv = CSV.open("users_universities_o.csv", "a", encoding: "Shift_JIS:UTF-8") # 2回目以降実行時
+if CSV.read("users_universities_output.csv").empty? # 初回実行時
+  new_csv = CSV.open("users_universities_output.csv", "w")
+  new_csv << []
+else # 2回目以降実行時
+  new_csv = CSV.open("users_universities_output.csv", "a")
+end
 
 data.each do |d|
   new_csv << [d] # uniqueな大学リストをcsvに出力する
