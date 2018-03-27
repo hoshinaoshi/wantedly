@@ -36,8 +36,9 @@ def bookmark
 end
 
 def add_non_fav
-  if find(".select-tag-section-body-tag", text: "_エンジニア")[:class] == "select-tag-section-body-tag"
-    find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
+  not_engineer_group = find(".select-tag-section-body-tag", text: "_エンジニア")
+  if not_engineer_group[:class] == "select-tag-section-body-tag"
+    not_engineer_group.trigger("click")
   end
 end
 
@@ -85,34 +86,36 @@ pages.times do
 
           if s.text.include?("大学") && s.text.include?("高校") == false && s.text.include?("高等学校") == false && s.text.include?("院") == false or
              s.text.include?("University") # 大学付属高校や大学院ではない
+             # 大学名を2回書いてしまう人には対処できないが、さすがにそんな人はなかなかいないので無視して良いかも
+
               university = s.text # 出身大学名
+
               if data.select {| univ | university.include?(univ) }.empty? == false # univはcsv内の大学名
                 # if ~~~ empty? で_エンジニアグループに追加すると、追加すべき人を追加し損ねてしまうため、if ~~~ empty? == false でエンジニアグループに追加
+
+                engineer_group = all(".select-tag-section-body-tag", text: "エンジニア")[0]
+
                 bookmark
-                if all(".select-tag-section-body-tag", text: "エンジニア")[0][:class] == "select-tag-section-body-tag"
-                  all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+                if engineer_group[:class] == "select-tag-section-body-tag"
+                  engineer_group.trigger("click")
                 end
-                puts find(".select-tag-section-body-tag", text: "_エンジニア")[:class]
-                puts all(".select-tag-section-body-tag", text: "エンジニア")[0][:class]
                 puts "追加した: " + user_name + " " + university + " " + user_age
+
               else
                 bookmark
                 add_non_fav
                 puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
               end
+
           else # .clickable-name の中身が大学やUniversityではない
+
             bookmark
             add_non_fav
             puts user_name + " " + user_age + " :大卒ではないか、あるいはこの要素が大卒者の職歴に関するものである"
             # .clickable-name で職歴なども取って来ざるを得ないためこうなる
-            # putsの回数は、.clickable-name がついた要素の個数に依存する
+
           end
-          # 院卒の人は必然的に大卒(なはず)なので、処理がダブってしまいお気に入り登録できなくなるかも
-          # 大学付属の高校まで取ってきてしまうのも問題
-          # 大学名を2回書いてしまう人には対処できないが、さすがにそんな人はなかなかいないので無視して良いかも
-
         end
-
       else
         span_contents.each do |s|
           bookmark
