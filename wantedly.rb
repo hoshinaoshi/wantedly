@@ -98,7 +98,7 @@ pages.times do
       else
         find(".bookmark-button").trigger("click") # お気に入りリストに追加
         find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
-        puts "35歳以上: " + user_name
+        puts "36歳以上: " + user_name
       end
 
     end
