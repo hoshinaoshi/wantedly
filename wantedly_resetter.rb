@@ -31,6 +31,7 @@ all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
 puts "Successfully logged in"
 find(".label", text: "スカウト").trigger("click") # パラメータつきでURLにvisitすると何故かトップに行くので使わない
 find(".scout-bookmarked-users-button").trigger("click")
+all(".tag-manager-tag", text: "エンジニア")[0].trigger("click")
 sleep(3)
 
 waitings = all(".content-title-count")[0].text.to_i # お気に入り人数
@@ -45,4 +46,5 @@ pages.times do
     sleep(rand(3))
   end
   visit current_url
+  sleep(3)
 end
