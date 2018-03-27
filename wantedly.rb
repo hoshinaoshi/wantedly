@@ -147,8 +147,11 @@ CSV.read("users_universities.csv", encoding: "Shift_JIS:UTF-8").flatten.uniq.eac
   data << a # ユーザの卒業大学をuniqueでdataに入れる
 end
 
-# new_csv = CSV.open("users_universities_o.csv", "w", encoding: "Shift_JIS:UTF-8") # 初回実行時のみ
-new_csv << []
+# new_csv = CSV.open("users_universities_o.csv", "w", encoding: "Shift_JIS:UTF-8") # 初回実行時
+# new_csv << [] # 初回実行時
+
+new_csv = CSV.open("users_universities_o.csv", "a", encoding: "Shift_JIS:UTF-8") # 2回目以降実行時
+
 data.each do |d|
   new_csv << [d] # uniqueな大学リストをcsvに出力する
 end
