@@ -30,6 +30,15 @@ def is_applicable?
   age.between?(18, 35)
 end
 
+def bookmark
+  find(".bookmark-button").trigger("click") if find(".bookmark-button")[:class] == "bookmark-button" # 未ブクマであれば
+end
+
+def add_non_fav
+  find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click") if
+    find(".select-tag-section-body-tag", text: "_エンジニア")[:class] == "select-tag-section-body-tag" # グループをselectedしてなければ
+end
+
 page.driver.headers = { "User-Agent": "Mac Safari" }
 page.driver.resize_window(1500, 1000) # スクショ用
 
@@ -75,17 +84,18 @@ pages.times do
             s.text.include?("University")                # 最終学歴が大学・大学院であれば
               university = s.text # 出身大学名
               if data.select {| univ | university.include?(univ) }.empty? # univはcsv内の大学名
-                find(".bookmark-button").trigger("click") # お気に入りリストに追加
-                find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
+                bookmark
+                add_non_fav
                 puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
               else
-                find(".bookmark-button").trigger("click") # お気に入りリストに追加
-                all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
+                bookmark
+                all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click") if
+                  all(".select-tag-section-body-tag", text: "エンジニア")[0][:class] == "select-tag-section-body-tag" # グループをselectedしてなければ
                 puts "追加した: " + user_name + " " + university + " " + user_age
               end
           else # .clickable-name の中身が大学やUniversityではない
-            find(".bookmark-button").trigger("click") # お気に入りリストに追加
-            find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
+            bookmark
+            add_non_fav
             puts user_name + " " + user_age + " :大卒ではないか、あるいはこの要素が大卒者の職歴に関するものである"
             # .clickable-name で職歴なども取って来ざるを得ないためこうなる
             # putsの回数は、.clickable-name がついた要素の個数に依存する
@@ -99,7 +109,7 @@ pages.times do
       else
         find(".bookmark-button").trigger("click") # お気に入りリストに追加
         find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
-        puts "36歳以上: " + user_name
+        #puts "36歳以上: " + user_name
       end
 
     end
