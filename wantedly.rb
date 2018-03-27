@@ -80,7 +80,7 @@ pages.times do
                 puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
               else
                 find(".bookmark-button").trigger("click") # お気に入りリストに追加
-                find(".select-tag-section-body-tag", text: "エンジニア").trigger("click")
+                all(".select-tag-section-body-tag", text: "エンジニア")[0].trigger("click")
                 puts "追加した: " + user_name + " " + university + " " + user_age
               end
           else # .clickable-name の中身が大学やUniversityではない
@@ -94,6 +94,8 @@ pages.times do
           # 大学付属の高校まで取ってきてしまうのも問題
           # 大学名を2回書いてしまう人には対処できないが、さすがにそんな人はなかなかいないので無視して良いかも
 
+          sleep(5)
+
         end
 
       else
@@ -104,7 +106,7 @@ pages.times do
 
     end
 
-    sleep(rand(50))
+    sleep(rand(30))
 
   end
 
