@@ -74,6 +74,8 @@ pages.times do
           if s.text.include?("大学") || s.text.include?("University") # 最終学歴が大学・大学院であれば
             university = s.text # 出身大学名
             if data.select {| univ | university.include?(univ) }.empty? # univはcsv内の大学名
+              find(".bookmark-button").trigger("click") # お気に入りリストに追加
+              find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
               puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
             else
               find(".bookmark-button").trigger("click") # お気に入りリストに追加
@@ -81,6 +83,8 @@ pages.times do
               puts "追加した: " + user_name + " " + university + " " + user_age
             end
           else # .clickable-name の中身が大学やUniversityではない
+            find(".bookmark-button").trigger("click") # お気に入りリストに追加
+            find(".select-tag-section-body-tag", text: "_エンジニア").trigger("click")
             puts user_name + " " + user_age + " :大卒ではないか、あるいはこの要素が大卒者の職歴に関するものである"
             # .clickable-name で職歴なども取って来ざるを得ないためこうなる
             # putsの回数は、.clickable-name がついた要素の個数に依存する
@@ -101,9 +105,7 @@ pages.times do
 
   end
 
-  # execute_script("window.scrollBy(0,20000);") # ユーザをもっと読み込む
-  # puts all("article.user-profile").count
-  # visit current_path # reload
+  visit current_path # reload
   sleep(10)
 
 end
