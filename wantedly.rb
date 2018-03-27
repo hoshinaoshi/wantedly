@@ -72,7 +72,7 @@ waitings = find(".hits").text.to_i # スカウト待ち人数
 pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
 
 
-CSV.open("users_universities.csv", "w") do |csv_n_engineer| # 条件を満たさないと考えられた大学
+CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学
 
   pages.times do
     for num in 0..9 do # 一回のロードにつき10名
@@ -108,7 +108,7 @@ CSV.open("users_universities.csv", "w") do |csv_n_engineer| # 条件を満たさ
                   bookmark
                   add_non_fav
                   puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
-                  csv_n_engineer << [s.text] # 条件に満たないと判断された大学
+                  csv << [s.text] # 条件に満たないと判断された大学
                 end
 
             else # .clickable-name の中身が大学やUniversityではない
