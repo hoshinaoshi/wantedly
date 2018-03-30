@@ -63,7 +63,7 @@ conditions.each do |condition|
   set_condition(".select-box li", condition)
 end
 
-sleep(5) # 各条件指定時にsleepしない代わりにここでsleepして、ユーザ一覧を読み込む
+sleep(10) # 各条件指定時にsleepしない代わりにここでsleepして、ユーザ一覧を読み込む
 
 # 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
@@ -74,8 +74,7 @@ pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち1
 
 CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学
 
-  # pages.times do
-  1.times do
+  pages.times do
     for num in 0..9 do # 一回のロードにつき10名
       within(all("article.user-profile")[num]) do
         span_contents = all(".name .clickable-name")
@@ -135,8 +134,8 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
 
     end
 
+    sleep(600) # 10分待ってみる
     visit current_url # reload
-    sleep(10)
 
   end
 end
