@@ -134,7 +134,10 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
 
     end
 
+<<<<<<< HEAD
     random = Random.new
+=======
+>>>>>>> b38189a2bf4c0083b6bea438b65c68fc3741130a
     sleep(random.rand(600)+120) # 10~12分待ってみる
     visit current_url # reload
 
