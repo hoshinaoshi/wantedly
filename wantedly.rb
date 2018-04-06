@@ -135,7 +135,7 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
     end
 
     random = Random.new
-    sleep(random.rand(600)+120) # 10~12分待ってみる
+    sleep(random.rand(900)+120) # 15~17分待ってみる
     visit current_url # reload
 
   end
