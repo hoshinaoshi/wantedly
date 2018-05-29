@@ -75,67 +75,70 @@ pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち1
 CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学
 
   pages.times do
-    for num in 0..9 do # 一回のロードにつき10名
-      within(all("article.user-profile")[num]) do
-        span_contents = all(".name .clickable-name")
-        user_name = find("a.user-name").text
-        user_age = all("ul.user-activities .user-activity span")[1].text
+    # begin
+      for num in 0..9 do # 一回のロードにつき10名
+        within(all("article.user-profile")[num]) do
+          span_contents = all(".name .clickable-name")
+          user_name = find("a.user-name").text
+          user_age = all("ul.user-activities .user-activity span")[1].text
 
-        if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
-          data = CSV.read("universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
+          if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
+            data = CSV.read("universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
 
 
-          span_contents.each do |s|
+            span_contents.each do |s|
 
-            if s.text.include?("大学") && s.text.include?("高校") == false && s.text.include?("高等学校") == false && s.text.include?("院") == false or
-               s.text.include?("University") # 大学付属高校や大学院ではない
-               # 大学名を2回書いてしまう人には対処できないが、さすがにそんな人はなかなかいないので無視して良いかも
+              if s.text.include?("大学") && s.text.include?("高校") == false && s.text.include?("高等学校") == false && s.text.include?("院") == false or
+                 s.text.include?("University") # 大学付属高校や大学院ではない
+                 # 大学名を2回書いてしまう人には対処できないが、さすがにそんな人はなかなかいないので無視して良いかも
 
-                university = s.text # 出身大学名
+                  university = s.text # 出身大学名
 
-                if data.select {| univ | university.include?(univ) }.empty? == false # univはcsv内の大学名
-                  # if ~~~ empty? で_エンジニアグループに追加すると、追加すべき人を追加し損ねてしまうため、if ~~~ empty? == false でエンジニアグループに追加
+                  if data.select {| univ | university.include?(univ) }.empty? == false # univはcsv内の大学名
+                    # if ~~~ empty? で_エンジニアグループに追加すると、追加すべき人を追加し損ねてしまうため、if ~~~ empty? == false でエンジニアグループに追加
 
-                  engineer_group = all(".select-tag-section-body-tag", text: "エンジニア")[0]
+                    engineer_group = all(".select-tag-section-body-tag", text: "エンジニア")[0]
 
-                  bookmark
-                  if engineer_group[:class] == "select-tag-section-body-tag"
-                    engineer_group.trigger("click")
+                    bookmark
+                    if engineer_group[:class] == "select-tag-section-body-tag"
+                      engineer_group.trigger("click")
+                    end
+                    puts "追加した: " + user_name + " " + university + " " + user_age
+
+                  else
+                    bookmark
+                    add_non_fav
+                    puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
+                    csv << [s.text] # 条件に満たないと判断された大学を重複ありでusers_universities.csvに書き足し
                   end
-                  puts "追加した: " + user_name + " " + university + " " + user_age
 
-                else
-                  bookmark
-                  add_non_fav
-                  puts user_name + " " + university + " " + user_age + "は、条件に満たない大卒である"
-                  csv << [s.text] # 条件に満たないと判断された大学を重複ありでusers_universities.csvに書き足し
-                end
+              else # .clickable-name の中身が大学やUniversityではない
 
-            else # .clickable-name の中身が大学やUniversityではない
+                bookmark
+                add_non_fav
+                # puts user_name + " " + user_age + " :大卒ではないか、あるいはこの要素が大卒者の職歴に関するものである"
+                # .clickable-name で職歴なども取って来ざるを得ないためこうなる
 
+              end
+            end
+          else
+            span_contents.each do |s|
               bookmark
               add_non_fav
-              puts user_name + " " + user_age + " :大卒ではないか、あるいはこの要素が大卒者の職歴に関するものである"
-              # .clickable-name で職歴なども取って来ざるを得ないためこうなる
-
             end
+            puts "36歳以上: " + user_name
           end
-        else
-          span_contents.each do |s|
-            bookmark
-            add_non_fav
-          end
-          puts "36歳以上: " + user_name
-        end
 
-      end # within
+        end # within
 
-      sleep(rand(10))
+        sleep(rand(10))
 
-    end
-
+      end
+    # rescue
+    #   retry
+    # end
     random = Random.new
-    sleep(random.rand(900)+120) # 15~17分待ってみる
+    sleep(random.rand(1000)+200) # たくさん待ってみる
     visit current_url # reload
 
   end
