@@ -69,14 +69,20 @@ sleep(10) # 各条件指定時にsleepしない代わりにここでsleepして�
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
 waitings = find(".hits").text.to_i # スカウト待ち人数
-pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
+actual_pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
+pages = [actual_pages, 3].min # 現在の仕様だと最大3回しかループを回せないため…
 
+if pages == 0
+  puts "FORCEFULLY EXIT: There is no user remaining to add to the groups!"
+  exit!
+end
 
 CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
-
+  trial = 0
   pages.times do
+    trial += 1
     # begin
-      for num in 0..9 do # 一回のロードにつき10名
+      for num in 0..8 do # 一回のロードにつき10名のはずだが、失敗するため9名に
         within(all("article.user-profile")[num]) do
           span_contents = all(".name .clickable-name")
           user_name = find("a.user-name").text
@@ -88,8 +94,8 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
 
             span_contents.each do |s|
 
-              if s.text.include?("大学") && s.text.include?("高校") == false && s.text.include?("高等学校") == false && s.text.include?("院") == false or
-                 s.text.include?("University") # 大学付属高校や大学院ではない
+              if s.text.include?("大学") && s.text.include?("高校") == false && s.text.include?("高等学校") == false &&
+                 s.text.include?("院") == false or s.text.include?("University") # 大学付属高校や大学院ではない
                  # 大学名を2回書いてしまう人には対処できないが、さすがにそんな人はなかなかいないので無視して良いかも
 
                   university = s.text # 出身大学名
@@ -137,9 +143,22 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
     # rescue
     #   retry
     # end
+
+    # 前回読み込み時からかなり時間が経たないとスカウト候補者リストを更新できないため、ここで時間稼ぎ
+    if trial % 3 == 1 # 1回目の後
+      set_condition(".select-box li", "ログイン日順")
+    elsif trial % 3 == 2 # 2回目の後
+      set_condition(".select-box li", "登録日順")
+    elsif trial % 3 == 0 # 3回目の後 不要だが一応
+      set_condition(".select-box li", "おすすめ順")
+    end
+
+    puts "Starting to sleep for a few minutes"
+    binding.pry
+
     random = Random.new
-    sleep(random.rand(1000)+200) # たくさん待ってみる
-    visit current_url # reload
+    sleep(random.rand(100)+10)
+    # visit current_url # reload
 
   end
 end
