@@ -72,7 +72,7 @@ waitings = find(".hits").text.to_i # スカウト待ち人数
 pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
 
 
-CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学
+CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
 
   pages.times do
     # begin
