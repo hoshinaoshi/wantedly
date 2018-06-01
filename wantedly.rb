@@ -154,7 +154,6 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
     end
 
     puts "Starting to sleep for a few minutes"
-    binding.pry
 
     random = Random.new
     sleep(random.rand(100)+10)
