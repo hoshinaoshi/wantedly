@@ -81,7 +81,7 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
   trial = 0
   pages.times do
     trial += 1
-    # begin
+    if waitings >= 9
       for num in 0..8 do # 一回のロードにつき10名のはずだが、失敗するため9名に
         within(all("article.user-profile")[num]) do
           span_contents = all(".name .clickable-name")
@@ -140,9 +140,7 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
         sleep(rand(10))
 
       end
-    # rescue
-    #   retry
-    # end
+    end # if waitings >= 9 に対して
 
     # 前回読み込み時からかなり時間が経たないとスカウト候補者リストを更新できないため、ここで時間稼ぎ
     if trial % 3 == 1 # 1回目の後
