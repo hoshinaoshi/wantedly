@@ -1,36 +1,22 @@
-require "capybara"
-require "capybara/dsl"
-require "capybara/poltergeist"
-require "csv"
-require "pry"
+require_relative "capybara_config"
+require_relative "access_searching_page"
 
-Capybara.current_driver = :poltergeist
-
-Capybara.configure do |config|
-  config.run_server = false
-  config.javascript_driver = :poltergeist
-  config.app_host = "https://www.wantedly.com"
-  config.default_max_wait_time = 10
-  config.ignore_hidden_elements = false
-end
-
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, {timeout: 120, js: true, js_errors: false})
-end
-
+include CapybaraConfig
+include AccessSearchingPage
 include Capybara::DSL # 警告が出るが動く
 
+CapybaraConfig.set_config
 
-def set_condition(selector, text)
+def set_condition(selector, text) # 共通
   find(selector, text: text).trigger("click")
 end
 
-def is_applicable?
+def is_applicable? # 職種による
   age = all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i
   age.between?(18, 35)
 end
 
-def bookmark
+def bookmark # 共通
   find(".bookmark-button").trigger("click") if find(".bookmark-button")[:class] == "bookmark-button" # 未ブクマであれば
   sleep(0.5) # wait
 end
@@ -42,20 +28,8 @@ def add_non_fav
   end
 end
 
-page.driver.headers = { "User-Agent": "Mac Safari" }
-page.driver.resize_window(1500, 1000) # スクショ用
-
-visit("/user/sign_in")
-
-fill_in "user[email]", with: ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
-fill_in "user[password]", with: ARGV[1]
-
-all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
-puts "Successfully logged in"
-
-find(".label", text: "スカウト").trigger("click") # パラメータつきでURLにvisitすると何故かトップに行くので使わない
-
-set_condition(".toggle-filter-panel", "条件で探す")
+AccessSearchingPage.login
+AccessSearchingPage.access_scout_page
 
 conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
 
@@ -77,6 +51,7 @@ if pages == 0
   exit!
 end
 
+save_screenshot
 CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
   pages.times do
@@ -171,3 +146,5 @@ new_csv = CSV.open("users_universities_output.csv", "w")
 data.each do |d|
   new_csv << [d] # uniqueな大学リストをcsvに出力する
 end
+
+puts "Finished successfully"
