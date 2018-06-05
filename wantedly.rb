@@ -1,25 +1,7 @@
-require "capybara"
-require "capybara/dsl"
-require "capybara/poltergeist"
-require "csv"
-require "pry"
+require_relative "capybara_config"
 
-Capybara.current_driver = :poltergeist
-
-Capybara.configure do |config|
-  config.run_server = false
-  config.javascript_driver = :poltergeist
-  config.app_host = "https://www.wantedly.com"
-  config.default_max_wait_time = 10
-  config.ignore_hidden_elements = false
-end
-
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, {timeout: 120, js: true, js_errors: false})
-end
-
+include CapybaraConfig
 include Capybara::DSL # 警告が出るが動く
-
 
 def set_condition(selector, text)
   find(selector, text: text).trigger("click")
@@ -171,3 +153,5 @@ new_csv = CSV.open("users_universities_output.csv", "w")
 data.each do |d|
   new_csv << [d] # uniqueな大学リストをcsvに出力する
 end
+
+puts "Finished successfully"
