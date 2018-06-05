@@ -52,7 +52,7 @@ if pages == 0
 end
 
 save_screenshot
-CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
+CSV.open("csv/users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
   pages.times do
     trial += 1
@@ -64,7 +64,7 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
           user_age = all("ul.user-activities .user-activity span")[1].text
 
           if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
-            data = CSV.read("universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
+            data = CSV.read("csv/universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
 
 
             span_contents.each do |s|
@@ -137,11 +137,11 @@ end
 
 data = []
 
-CSV.read("users_universities.csv").flatten.uniq.each do |a|
+CSV.read("csv/users_universities.csv").flatten.uniq.each do |a|
   data << a # ユーザの卒業大学をuniqueでdataに入れる
 end
 
-new_csv = CSV.open("users_universities_output.csv", "w")
+new_csv = CSV.open("csv/users_universities_output.csv", "w")
 
 data.each do |d|
   new_csv << [d] # uniqueな大学リストをcsvに出力する
