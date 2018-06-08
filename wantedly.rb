@@ -55,7 +55,8 @@ else
   exit!
 end
 
-puts "以下の条件で検索します：" + conditions.join(", ")
+puts "以下の条件で検索します：" + conditions.join(", ") + ", 18~35歳, 大卒以上(偏差値58以上)"
+puts "年齢と学歴に関して修正がある場合は、玉井までお知らせください。"
 
 conditions.each do |condition|
   set_condition(".select-box li", condition)
