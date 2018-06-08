@@ -33,7 +33,7 @@ def bookmark # 共通
 end
 
 def add_non_fav
-  not_engineer_group = find(".select-tag-section-body-tag", text: "_エンジニア")
+  not_engineer_group = find(".select-tag-section-body-tag", text: "_#{$group}")
   if not_engineer_group[:class] == "select-tag-section-body-tag"
     not_engineer_group.trigger("click")
   end
@@ -43,8 +43,10 @@ AccessSearchingPage.login
 AccessSearchingPage.access_scout_page
 
 if ARGV[0] == "eng"
+  $group = "エンジニア"
   conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
 elsif ARGV[0] == "des"
+  $group = "デザイナー"
   conditions = %w(デザイナー 1週間以内にログイン 関東 転職意欲が高い)
 else
   puts "コマンドの末尾に正しい引数を指定してください。"
@@ -70,6 +72,7 @@ if pages == 0
   exit!
 end
 
+# 注意：デザイナーが学歴を考慮しない場合、ここで条件分岐する！！！
 CSV.open("csv/users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
   pages.times do
@@ -84,7 +87,6 @@ CSV.open("csv/users_universities.csv", "a") do |csv| # 条件を満たさない�
           if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
             data = CSV.read("csv/universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
 
-
             span_contents.each do |s|
 
               if s.text.include?("大学") && s.text.include?("高校") == false && s.text.include?("高等学校") == false &&
@@ -96,7 +98,7 @@ CSV.open("csv/users_universities.csv", "a") do |csv| # 条件を満たさない�
                   if data.select {| univ | university.include?(univ) }.empty? == false # univはcsv内の大学名
                     # if ~~~ empty? で_エンジニアグループに追加すると、追加すべき人を追加し損ねてしまうため、if ~~~ empty? == false でエンジニアグループに追加
 
-                    engineer_group = all(".select-tag-section-body-tag", text: "エンジニア")[0]
+                    engineer_group = all(".select-tag-section-body-tag", text: "#{$group}")[0]
 
                     bookmark
                     if engineer_group[:class] == "select-tag-section-body-tag"
