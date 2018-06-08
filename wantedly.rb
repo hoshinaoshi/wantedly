@@ -9,6 +9,10 @@
 # ruby wantedly.rb eng // エンジニアの場合
 # ruby wantedly.rb des // デザイナーの場合
 
+# wantedlyのリロード時の処理の都合により、
+# 1. 一度にふるいにかけられるユーザ数は最大27名です
+# 2. コマンド実行の間隔が20分以内程度だと、グループへの追加がうまくいきません
+
 require_relative "capybara_config"
 require_relative "access_searching_page"
 
@@ -150,7 +154,6 @@ CSV.open("csv/users_universities.csv", "a") do |csv| # 条件を満たさない�
 
     random = Random.new
     sleep(random.rand(100)+10)
-    # visit current_url # reload
 
   end
 end
