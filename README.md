@@ -38,6 +38,6 @@ write and quit して、
 
 # コマンドの例
 ```
-ruby wantedly.rb eng all // エンジニアで全国から絞り込みたい場合
-ruby wantedly.rb des kanto // デザイナーで関東から絞り込みたい場合
+$ ruby wantedly.rb eng all // エンジニアで全国から絞り込みたい場合
+$ ruby wantedly.rb des kanto // デザイナーで関東から絞り込みたい場合
 ```
