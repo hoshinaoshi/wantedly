@@ -1,18 +1,3 @@
-# 実行の前に環境変数を設定してください
-# $ vim ~/.bash_profile
-# export WANTEDLY_EMAIL=wantedlyに登録したemail address
-# export WANTEDLY_PASS=wantedlyに登録したpassword
-# write and quit
-# source ~/.bash_profile
-
-# コマンドの例
-# ruby wantedly.rb eng // エンジニアの場合
-# ruby wantedly.rb des // デザイナーの場合
-
-# wantedlyのリロード時の処理の都合により、
-# 1. 一度にふるいにかけられるユーザ数は最大27名です
-# 2. コマンド実行の間隔が20分以内程度だと、グループへの追加がうまくいきません
-
 require_relative "capybara_config"
 require_relative "access_searching_page"
 
@@ -43,20 +28,34 @@ def add_non_fav
   end
 end
 
+def raise_arg_error
+  puts "コマンドの末尾に正しい引数を指定してください。"
+  puts "エンジニアの第一引数: eng, デザイナーの第一引数: des"
+  puts "関東に絞り込む場合の第二引数: kanto, 全国から探す場合の第二引数: all"
+end
+
 AccessSearchingPage.login
 AccessSearchingPage.access_scout_page
 
 if ARGV[0] == "eng"
   $group = "エンジニア"
-  conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
 elsif ARGV[0] == "des"
   $group = "デザイナー"
-  conditions = %w(デザイナー 1週間以内にログイン 関東 転職意欲が高い)
 else
-  puts "コマンドの末尾に正しい引数を指定してください。"
-  puts "エンジニアの場合: eng, デザイナーの場合: des"
+  raise_arg_error
   exit!
 end
+
+if ARGV[1] == "all"
+  conditions = %W(#{$group} 1週間以内にログイン 転職意欲が高い)
+elsif ARGV[1] == "kanto"
+  conditions = %W(#{$group} 1週間以内にログイン 関東 転職意欲が高い)
+else
+  raise_arg_error
+  exit!
+end
+
+puts "以下の条件で検索します：" + conditions.join(", ")
 
 conditions.each do |condition|
   set_condition(".select-box li", condition)
@@ -77,7 +76,7 @@ if pages == 0
 end
 
 # 注意：デザイナーが学歴を考慮しない場合、ここで条件分岐する！！！
-CSV.open("csv/users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
+CSV.open("csv/users_universities_#{$group}.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
   pages.times do
     trial += 1
@@ -160,11 +159,11 @@ end
 
 data = []
 
-CSV.read("csv/users_universities.csv").flatten.uniq.each do |a|
+CSV.read("csv/users_universities_#{$group}.csv").flatten.uniq.each do |a|
   data << a # ユーザの卒業大学をuniqueでdataに入れる
 end
 
-new_csv = CSV.open("csv/users_universities_output.csv", "w")
+new_csv = CSV.open("csv/users_universities_output_#{$group}.csv", "w")
 
 data.each do |d|
   new_csv << [d] # uniqueな大学リストをcsvに出力する
