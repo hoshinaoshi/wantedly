@@ -1,3 +1,14 @@
+# 実行の前に環境変数を設定してください
+# $ vim ~/.bash_profile
+# export WANTEDLY_EMAIL=wantedlyに登録したemail address
+# export WANTEDLY_PASS=wantedlyに登録したpassword
+# write and quit
+# source ~/.bash_profile
+
+# コマンドの例
+# ruby wantedly.rb eng // エンジニアの場合
+# ruby wantedly.rb des // デザイナーの場合
+
 require_relative "capybara_config"
 require_relative "access_searching_page"
 
@@ -31,7 +42,15 @@ end
 AccessSearchingPage.login
 AccessSearchingPage.access_scout_page
 
-conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
+if ARGV[0] == "eng"
+  conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
+elsif ARGV[0] == "des"
+  conditions = %w(デザイナー 1週間以内にログイン 関東 転職意欲が高い)
+else
+  puts "コマンドの末尾に正しい引数を指定してください。"
+  puts "エンジニアの場合: eng, デザイナーの場合: des"
+  exit!
+end
 
 conditions.each do |condition|
   set_condition(".select-box li", condition)
@@ -51,7 +70,6 @@ if pages == 0
   exit!
 end
 
-save_screenshot
 CSV.open("csv/users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
   pages.times do
