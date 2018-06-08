@@ -5,7 +5,7 @@
 export WANTEDLY_EMAIL=wantedlyに登録したemail address
 export WANTEDLY_PASS=wantedlyに登録したpassword
 ```
-write and quit  
+write and quit して、  
 `$ source ~/.bash_profile`
 
 # コマンドの引数について
