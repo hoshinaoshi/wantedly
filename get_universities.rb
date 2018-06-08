@@ -2,7 +2,7 @@ require "nokogiri"
 require "open-uri"
 require "csv"
 
-CSV.open("universities-pri.csv", "w") do |csv|
+CSV.open("csv/universities-pri.csv", "w") do |csv|
 
   uris = %w(/zenkokushirituranking1.html /zenkokushiriturankong2.html) #国公立
   # uris = %w(/zenkokukokkourituranking1.html /zenkokukokkourituranking2.html) #私立
@@ -18,6 +18,6 @@ CSV.open("universities-pri.csv", "w") do |csv|
   end
 end
 
-# CSV.read("universities.csv").each do |u|
+# CSV.read("csv/universities.csv").each do |u|
 #   puts u
 # end
