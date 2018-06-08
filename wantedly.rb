@@ -1,63 +1,62 @@
-require "capybara"
-require "capybara/dsl"
-require "capybara/poltergeist"
-require "csv"
-require "pry"
+require_relative "capybara_config"
+require_relative "access_searching_page"
 
-Capybara.current_driver = :poltergeist
-
-Capybara.configure do |config|
-  config.run_server = false
-  config.javascript_driver = :poltergeist
-  config.app_host = "https://www.wantedly.com"
-  config.default_max_wait_time = 10
-  config.ignore_hidden_elements = false
-end
-
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, {timeout: 120, js: true, js_errors: false})
-end
-
+include CapybaraConfig
+include AccessSearchingPage
 include Capybara::DSL # 警告が出るが動く
 
+CapybaraConfig.set_config
 
-def set_condition(selector, text)
+def set_condition(selector, text) # 共通
   find(selector, text: text).trigger("click")
 end
 
-def is_applicable?
+def is_applicable? # 職種による
   age = all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i
   age.between?(18, 35)
 end
 
-def bookmark
+def bookmark # 共通
   find(".bookmark-button").trigger("click") if find(".bookmark-button")[:class] == "bookmark-button" # 未ブクマであれば
   sleep(0.5) # wait
 end
 
 def add_non_fav
-  not_engineer_group = find(".select-tag-section-body-tag", text: "_エンジニア")
+  not_engineer_group = find(".select-tag-section-body-tag", text: "_#{$group}")
   if not_engineer_group[:class] == "select-tag-section-body-tag"
     not_engineer_group.trigger("click")
   end
 end
 
-page.driver.headers = { "User-Agent": "Mac Safari" }
-page.driver.resize_window(1500, 1000) # スクショ用
+def raise_arg_error
+  puts "コマンドの末尾に正しい引数を指定してください。"
+  puts "エンジニアの第一引数: eng, デザイナーの第一引数: des"
+  puts "関東に絞り込む場合の第二引数: kanto, 全国から探す場合の第二引数: all"
+end
 
-visit("/user/sign_in")
+AccessSearchingPage.login
+AccessSearchingPage.access_scout_page
 
-fill_in "user[email]", with: ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
-fill_in "user[password]", with: ARGV[1]
+if ARGV[0] == "eng"
+  $group = "エンジニア"
+elsif ARGV[0] == "des"
+  $group = "デザイナー"
+else
+  raise_arg_error
+  exit!
+end
 
-all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
-puts "Successfully logged in"
+if ARGV[1] == "all"
+  conditions = %W(#{$group} 1週間以内にログイン 転職意欲が高い)
+elsif ARGV[1] == "kanto"
+  conditions = %W(#{$group} 1週間以内にログイン 関東 転職意欲が高い)
+else
+  raise_arg_error
+  exit!
+end
 
-find(".label", text: "スカウト").trigger("click") # パラメータつきでURLにvisitすると何故かトップに行くので使わない
-
-set_condition(".toggle-filter-panel", "条件で探す")
-
-conditions = %w(エンジニア 1週間以内にログイン 関東 転職意欲が高い)
+puts "以下の条件で検索します：" + conditions.join(", ") + ", 18~35歳, 大卒以上(偏差値58以上)"
+puts "年齢と学歴に関して修正がある場合は、玉井までお知らせください。"
 
 conditions.each do |condition|
   set_condition(".select-box li", condition)
@@ -77,7 +76,8 @@ if pages == 0
   exit!
 end
 
-CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
+# 注意：デザイナーが学歴を考慮しない場合、ここで条件分岐する！！！
+CSV.open("csv/users_universities_#{$group}.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
   pages.times do
     trial += 1
@@ -89,8 +89,7 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
           user_age = all("ul.user-activities .user-activity span")[1].text
 
           if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
-            data = CSV.read("universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
-
+            data = CSV.read("csv/universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
 
             span_contents.each do |s|
 
@@ -103,7 +102,7 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
                   if data.select {| univ | university.include?(univ) }.empty? == false # univはcsv内の大学名
                     # if ~~~ empty? で_エンジニアグループに追加すると、追加すべき人を追加し損ねてしまうため、if ~~~ empty? == false でエンジニアグループに追加
 
-                    engineer_group = all(".select-tag-section-body-tag", text: "エンジニア")[0]
+                    engineer_group = all(".select-tag-section-body-tag", text: "#{$group}")[0]
 
                     bookmark
                     if engineer_group[:class] == "select-tag-section-body-tag"
@@ -155,19 +154,20 @@ CSV.open("users_universities.csv", "a") do |csv| # 条件を満たさないと�
 
     random = Random.new
     sleep(random.rand(100)+10)
-    # visit current_url # reload
 
   end
 end
 
 data = []
 
-CSV.read("users_universities.csv").flatten.uniq.each do |a|
+CSV.read("csv/users_universities_#{$group}.csv").flatten.uniq.each do |a|
   data << a # ユーザの卒業大学をuniqueでdataに入れる
 end
 
-new_csv = CSV.open("users_universities_output.csv", "w")
+new_csv = CSV.open("csv/users_universities_output_#{$group}.csv", "w")
 
 data.each do |d|
   new_csv << [d] # uniqueな大学リストをcsvに出力する
 end
+
+puts "Finished successfully"

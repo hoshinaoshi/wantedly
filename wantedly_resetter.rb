@@ -24,8 +24,8 @@ page.driver.headers = { "User-Agent": "Mac Safari" }
 
 visit("/user/sign_in")
 
-fill_in "user[email]", with: ARGV[0], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
-fill_in "user[password]", with: ARGV[1]
+fill_in "user[email]", with: ENV["WANTEDLY_EMAIL"], match: :first # 同様のname属性を持つタグが他にあるため、この場合最初にマッチするものを探す
+fill_in "user[password]", with: ENV["WANTEDLY_PASS"]
 
 all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
 puts "Successfully logged in"
