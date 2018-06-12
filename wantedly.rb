@@ -34,9 +34,6 @@ def raise_arg_error
   puts "関東に絞り込む場合の第二引数: kanto, 全国から探す場合の第二引数: all"
 end
 
-AccessSearchingPage.login
-AccessSearchingPage.access_scout_page
-
 if ARGV[0] == "eng"
   $group = "エンジニア"
 elsif ARGV[0] == "des"
@@ -54,6 +51,9 @@ else
   raise_arg_error
   exit!
 end
+
+AccessSearchingPage.login
+AccessSearchingPage.access_scout_page
 
 puts "以下の条件で検索します：" + conditions.join(", ") + ", 18~35歳, 大卒以上(偏差値58以上)"
 puts "年齢と学歴に関して修正がある場合は、玉井までお知らせください。"
