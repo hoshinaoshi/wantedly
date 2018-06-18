@@ -41,3 +41,16 @@ write and quit して、
 $ ruby wantedly.rb eng all // エンジニアで全国から絞り込みたい場合
 $ ruby wantedly.rb des kanto // デザイナーで関東から絞り込みたい場合
 ```
+
+# crontabから実行したい場合
+スクリプト内の条件分岐により、crontab（実行時のworking directoryがhome directory）からの実行時も同じコマンドで実行可能です。  
+ただし、**crontabファイル内に**環境変数の設定が必要となります。  
+
+## crontabの例
+WANTEDLY_EMAIL=ayumi.tamai@pixta.co.jp
+WANTEDLY_PASS=password
+
+```
+@reboot sleep 120; export LANG=ja_JP.UTF-8; /Users/ayumi_tamai/.rbenv/versions/2.4.0/bin/ruby /Users/ayumi_tamai/wantedly/wantedly.rb eng all 1> /Users/ayumi_tamai/wantedly/exec.log
+```
+rubyとスクリプトはそれぞれ絶対パスで指定しています。
