@@ -4,6 +4,7 @@ module CapybaraConfig
   require "capybara/poltergeist"
   require "csv"
   require "pry"
+  require 'phantomjs' 
 
   def set_config
     Capybara.current_driver = :poltergeist
@@ -17,7 +18,7 @@ module CapybaraConfig
     end
 
     Capybara.register_driver :poltergeist do |app|
-      Capybara::Poltergeist::Driver.new(app, {timeout: 120, js: true, js_errors: false})
+      Capybara::Poltergeist::Driver.new(app, {timeout: 120, js: true, js_errors: false, phantomjs: Phantomjs.path})
     end
 
     page.driver.headers = { "User-Agent": "Mac Safari" }
