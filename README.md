@@ -16,7 +16,7 @@ wantedlyのリロード時の処理の都合により、
 1. 一度にふるいにかけられるユーザ数は最大27名です
 2. コマンド実行の間隔が20分以内程度だと、グループへの追加がうまくいきません
 
-# 【重要】コマンドを実行する前の準備
+# 【重要】コマンドを実行する前の準備（コマンドラインから実行する場合）
 実行の前に環境変数を設定してください。  
 `$ vim ~/.bash_profile`
 ```
@@ -42,7 +42,7 @@ $ ruby wantedly.rb eng all // エンジニアで全国から絞り込みたい�
 $ ruby wantedly.rb des kanto // デザイナーで関東から絞り込みたい場合
 ```
 
-# crontabから実行したい場合
+# **appendix:** crontabから実行したい場合
 スクリプト内の条件分岐により、crontab（実行時のworking directoryがhome directory）からの実行時も同じコマンドで実行可能です。  
 ただし、**crontabファイル内に**環境変数の設定が必要となります。  
 
@@ -53,4 +53,5 @@ WANTEDLY_PASS=password
 
 @reboot sleep 120; export LANG=ja_JP.UTF-8; /Users/ayumi_tamai/.rbenv/versions/2.4.0/bin/ruby /Users/ayumi_tamai/wantedly/wantedly.rb eng all 1> /Users/ayumi_tamai/wantedly/exec.log
 ```
-rubyとスクリプトはそれぞれ絶対パスで指定しています。
+rubyとスクリプトはそれぞれ絶対パスで指定しています。  
+使用するgem(capybaraなど)が、指定したruby versionでインストールされているか確認が必要です。
