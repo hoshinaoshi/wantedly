@@ -52,6 +52,16 @@ else
   exit!
 end
 
+if Dir.pwd.include?("/wantedly")
+  # コマンドラインから実行
+  pwd = Dir.pwd
+else
+  # crontabから実行
+  pwd = Dir.pwd + "/wantedly"
+end
+
+puts pwd
+
 AccessSearchingPage.login
 AccessSearchingPage.access_scout_page
 
@@ -77,7 +87,7 @@ if pages == 0
 end
 
 # 注意：デザイナーが学歴を考慮しない場合、ここで条件分岐する！！！
-CSV.open("csv/users_universities_#{$group}.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
+CSV.open(pwd+ "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
   pages.times do
     trial += 1
@@ -89,7 +99,7 @@ CSV.open("csv/users_universities_#{$group}.csv", "a") do |csv| # 条件を満た
           user_age = all("ul.user-activities .user-activity span")[1].text
 
           if is_applicable? # 36歳以上の処理を飛ばすと35歳未満の最後の人への処理が重複してしまう (∵ in 0..9)
-            data = CSV.read("csv/universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
+            data = CSV.read(pwd + "/csv/universities.csv").flatten # csvデータが1列だが2次元配列になってしまっているため
 
             span_contents.each do |s|
 
@@ -160,11 +170,11 @@ end
 
 data = []
 
-CSV.read("csv/users_universities_#{$group}.csv").flatten.uniq.each do |a|
+CSV.read(pwd+ "/csv/users_universities_#{ARGV[0]}.csv").flatten.uniq.each do |a|
   data << a # ユーザの卒業大学をuniqueでdataに入れる
 end
 
-new_csv = CSV.open("csv/users_universities_output_#{$group}.csv", "w")
+new_csv = CSV.open(pwd+ "/csv/users_universities_output_#{ARGV[0]}.csv", "w")
 
 data.each do |d|
   new_csv << [d] # uniqueな大学リストをcsvに出力する
