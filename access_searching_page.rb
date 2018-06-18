@@ -14,6 +14,7 @@ module AccessSearchingPage
     fill_in "user[password]", with: ENV["WANTEDLY_PASS"]
 
     all(".wt-ui-button-blue")[0].trigger("click") # ログインボタン
+    puts current_url
     puts "Successfully logged in"
   end
 
