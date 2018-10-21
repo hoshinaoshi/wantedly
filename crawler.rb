@@ -6,7 +6,7 @@ class Crawler
   include AccessSearchingPage
   include Capybara::DSL
 
-  attr_accessor :group, :conditions, :pwd
+  attr_accessor :group, :conditions, :pwd, :pages, :waitings
 
   def initialize
     set_capybara_config
@@ -40,6 +40,17 @@ class Crawler
 
   def set_condition(selector, text) # 共通
     find(selector, text: text).trigger("click")
+  end
+
+  def judge_candidates_count
+    @waitings = find(".hits").text.to_i # スカウト待ち人数
+    actual_pages = @waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
+    @pages = [actual_pages, 3].min # 現在の仕様だと最大3回しかループを回せないため…
+    
+    if pages == 0
+      puts "これ以上リストに追加できる候補者はいませんでした。"
+      exit!
+    end
   end
 
   def is_applicable_age?(age)

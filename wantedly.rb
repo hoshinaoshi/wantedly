@@ -10,24 +10,16 @@ crawler.conditions.each do |condition|
 end
 
 sleep(10) # 各条件指定時にsleepしない代わりにここでsleepして、ユーザ一覧を読み込む
-
 # 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
-waitings = crawler.find(".hits").text.to_i # スカウト待ち人数
-actual_pages = waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
-pages = [actual_pages, 3].min # 現在の仕様だと最大3回しかループを回せないため…
-
-if pages == 0
-  puts "これ以上リストに追加できる候補者はいませんでした。"
-  exit!
-end
+crawler.judge_candidates_count
 
 CSV.open(crawler.pwd + "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
-  pages.times do
+  crawler.pages.times do
     trial += 1
-    if waitings >= 9
+    if crawler.waitings >= 9
       for num in 0..8 do # 一回のロードにつき10名のはずだが、失敗するため9名に
         crawler.within(crawler.all("article.user-profile")[num]) do
           span_contents = crawler.all(".name .clickable-name")
