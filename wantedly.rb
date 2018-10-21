@@ -30,7 +30,7 @@ CSV.open(crawler.pwd + "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| #
           if crawler.is_applicable_age?(user_age)
             crawler.bookmark
             crawler.add_to_list_based_on_academic_bg(
-              spans: span_contents, list: not_engineer_group,
+              spans: span_contents, not_engineer_list: not_engineer_group,
               user_name: user_name, user_age: user_age, csv: csv)
           else
             span_contents.each do |s|
