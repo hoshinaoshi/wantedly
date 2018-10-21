@@ -42,8 +42,10 @@ class Crawler
     find(selector, text: text).trigger("click")
   end
 
-  def judge_candidates_count
-    @waitings = find(".hits").text.to_i # スカウト待ち人数
+  def judge_candidates_count(arg)
+    # スカウト待ち人数
+    @waitings = (arg == "scout" ? find(".hits") : find(".bookmarked-user-info-number-caution-count")).text.to_i
+
     actual_pages = @waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
     @pages = [actual_pages, 3].min # 現在の仕様だと最大3回しかループを回せないため…
     
@@ -85,15 +87,15 @@ class Crawler
 
         engineer_group = all(".select-tag-section-body-tag", text: "#{@group}")[0]
 
-        if engineer_group[:class] == "select-tag-section-body-tag"
-          engineer_group.trigger("click")
-        end
+        engineer_group.trigger("click") if engineer_group[:class] == "select-tag-section-body-tag"
         puts "追加した: " + user_name + " " + university + " " + user_age.to_s + "歳"
 
       else
         add_non_fav(list)
         puts user_name + " " + university + " " + user_age.to_s + "歳 は、条件に満たない大卒である"
-        csv << [s.text] # 条件に満たないと判断された大学を重複ありでusers_universities.csvに書き足し
+
+        # 条件に満たないと判断された大学を重複ありでusers_universities.csvに書き足し
+        csv << [s.text] unless csv.nil?
       end
     end
   end

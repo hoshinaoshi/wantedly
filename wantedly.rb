@@ -13,7 +13,7 @@ sleep(10) # 各条件指定時にsleepしない代わりにここでsleepして�
 # 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
 # ∴ 検索条件の段階で絞込しても、以下でプロフィールに表示される年齢を見て条件分岐しても、結果は同じ
 
-crawler.judge_candidates_count
+crawler.judge_candidates_count("scout")
 
 CSV.open(crawler.pwd + "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
