@@ -5,15 +5,14 @@ crawler.find(".scout-bookmarked-users-button").trigger("click")
 crawler.all(".tag-manager-tag", text: "_エンジニア")[0].trigger("click")
 crawler.judge_candidates_count("rescue")
 
-trial = 0
 crawler.pages.times do
-  trial += 1
   if crawler.waitings >= 9
     for num in 0..8 do # 一回のロードにつき10名のはずだが、失敗するため9名に
       crawler.within(crawler.all("article.user-profile")[num]) do
         span_contents = crawler.all(".name .clickable-name")
         user_name = crawler.find("a.user-name").text
         user_age = crawler.all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i
+        engineer_group = crawler.all(".select-tag-section-body-tag", text: "エンジニア")[0]
         ng_engineer_group = crawler.find(".select-tag-section-body-tag", text: "エンジニア_NG")
         not_engineer_group = crawler.all(".select-tag-section-body-tag", text: "_エンジニア")[0]
 
