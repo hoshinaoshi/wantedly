@@ -94,6 +94,7 @@ CSV.open(pwd+ "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| # 条件�
     if waitings >= 9
       for num in 0..8 do # 一回のロードにつき10名のはずだが、失敗するため9名に
         within(all("article.user-profile")[num]) do
+          # ここから
           span_contents = all(".name .clickable-name")
           user_name = find("a.user-name").text
           user_age = all("ul.user-activities .user-activity span")[1].text
@@ -143,7 +144,7 @@ CSV.open(pwd+ "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| # 条件�
             end
             puts "36歳以上: " + user_name
           end
-
+          # ここまで
         end # within
 
         sleep(rand(10))
