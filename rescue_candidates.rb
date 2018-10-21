@@ -5,7 +5,7 @@ crawler.find(".scout-bookmarked-users-button").trigger("click")
 crawler.all(".tag-manager-tag", text: "_エンジニア")[0].trigger("click")
 crawler.judge_candidates_count("rescue")
 
-crawler.pages.times do
+crawler.actual_pages.times do
   if crawler.waitings >= 9
     for num in 0..8 do # 一回のロードにつき10名のはずだが、失敗するため9名に
       crawler.within(crawler.all("article.user-profile")[num]) do

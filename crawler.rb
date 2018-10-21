@@ -6,7 +6,7 @@ class Crawler
   include AccessSearchingPage
   include Capybara::DSL
 
-  attr_accessor :group, :conditions, :pwd, :pages, :waitings
+  attr_accessor :group, :conditions, :pwd, :pages, :waitings, :actual_pages
 
   def initialize
     set_capybara_config
@@ -46,7 +46,7 @@ class Crawler
     # スカウト待ち人数
     @waitings = (arg == "scout" ? find(".hits") : find(".bookmarked-user-info-number-caution-count")).text.to_i
 
-    actual_pages = @waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
+    @actual_pages = @waitings.div(10) + 1 # 1ページ(ロード)あたりスカウト待ち10人 ∴スカウト待ち人数を10で割った商+1 がリロード回数
     @pages = [actual_pages, 3].min # 現在の仕様だと最大3回しかループを回せないため…
     
     if pages == 0
