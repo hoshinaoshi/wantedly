@@ -6,7 +6,7 @@ module CapybaraConfig
   require "pry"
   require 'phantomjs' 
 
-  def set_config
+  def set_capybara_config
     Capybara.current_driver = :poltergeist
 
     Capybara.configure do |config|
@@ -22,7 +22,7 @@ module CapybaraConfig
     end
 
     page.driver.headers = { "User-Agent": "Mac Safari" }
-    page.driver.resize_window(1500, 1000) # スクショ用
+    page.driver.resize_window(1500, 10000) # スクショ用
   end
 
 end
