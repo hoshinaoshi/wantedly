@@ -44,6 +44,7 @@ write and quit して、
 ```
 $ ruby wantedly.rb eng all // エンジニアで全国から絞り込みたい場合
 $ ruby wantedly.rb des kanto // デザイナーで関東から絞り込みたい場合
+$ ruby rescue_candidates.rb eng all // 「_エンジニア」リストを再スクリーニングする場合
 ```
 
 # **appendix:** crontabから実行したい場合
