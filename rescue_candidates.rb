@@ -17,18 +17,23 @@ crawler.actual_pages.times do
         not_engineer_group = crawler.all(".select-tag-section-body-tag", text: "_エンジニア")[0]
 
         if crawler.is_applicable_age?(user_age)
-          crawler.bookmark
+          crawler.open_bookmark
           crawler.add_to_list_based_on_academic_bg(
             spans: span_contents, not_engineer_list: not_engineer_group,
             user_name: user_name, user_age: user_age, csv: nil)
+
           not_engineer_group.trigger("click") if
             not_engineer_group[:class] == "select-tag-section-body-tag selected" ||
             engineer_group[:class] == "select-tag-section-body-tag selected"
         else
           span_contents.each do |s|
-            crawler.bookmark
+            crawler.open_bookmark
             crawler.add_non_fav(ng_engineer_group)
-            not_engineer_group.trigger("click") if not_engineer_group[:class] == "select-tag-section-body-tag selected"
+            crawler.add_non_fav(not_engineer_group)
+
+            not_engineer_group.trigger("click") if
+              not_engineer_group[:class] == "select-tag-section-body-tag selected" &&
+              ng_engineer_group[:class] == "select-tag-section-body-tag selected"
           end
           puts "36歳以上: " + user_name
         end

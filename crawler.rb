@@ -65,7 +65,7 @@ class Crawler
     text.include?("University")
   end
 
-  def bookmark # 共通
+  def open_bookmark
     find(".bookmark-button").trigger("click") if find(".bookmark-button")[:class] == "bookmark-button" # 未ブクマであれば
     sleep(0.5) # wait
   end
@@ -76,13 +76,13 @@ class Crawler
   end
 
   def add_to_list_based_on_academic_bg(spans:, not_engineer_list:, user_name:, user_age:, csv:)
-    data = CSV.read(@pwd + "/csv/universities.csv").flatten
+    csv_data = CSV.read(@pwd + "/csv/universities.csv").flatten
     spans.each do |s|
       add_non_fav(not_engineer_list) and next unless is_applicable_background?(s.text)
 
       university = s.text
 
-      if data.select { |univ| university.include?(univ) }.empty? == false # univはcsv内の大学名
+      if csv_data.select { |csv_univ| university.include?(csv_univ) }.empty? == false
         # if ~~~ empty? で_エンジニアグループに追加すると、追加すべき人を追加し損ねてしまうため、if ~~~ empty? == false でエンジニアグループに追加
 
         engineer_group = all(".select-tag-section-body-tag", text: "エンジニア")[0]
@@ -92,7 +92,8 @@ class Crawler
 
       else
         add_non_fav(not_engineer_list)
-        puts user_name + " " + university + " " + user_age.to_s + "歳 は、条件に満たない大卒である"
+        puts user_name + " " + university + " " + user_age.to_s + "歳 は、条件に満たない大卒である" if
+          /大学/.match(university) || /(u|U)niversity/.match(university)
 
         # 条件に満たないと判断された大学を重複ありでusers_universities.csvに書き足し
         csv << [s.text] unless csv.nil?
