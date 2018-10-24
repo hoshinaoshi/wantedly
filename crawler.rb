@@ -65,7 +65,7 @@ class Crawler
     text.include?("University")
   end
 
-  def bookmark # 共通
+  def open_bookmark
     find(".bookmark-button").trigger("click") if find(".bookmark-button")[:class] == "bookmark-button" # 未ブクマであれば
     sleep(0.5) # wait
   end
@@ -92,7 +92,8 @@ class Crawler
 
       else
         add_non_fav(not_engineer_list)
-        puts user_name + " " + university + " " + user_age.to_s + "歳 は、条件に満たない大卒である"
+        puts user_name + " " + university + " " + user_age.to_s + "歳 は、条件に満たない大卒である" if
+          /大学/.match(university) || /(u|U)niversity/.match(university)
 
         # 条件に満たないと判断された大学を重複ありでusers_universities.csvに書き足し
         csv << [s.text] unless csv.nil?

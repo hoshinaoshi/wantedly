@@ -28,13 +28,13 @@ CSV.open(crawler.pwd + "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| #
           not_engineer_group = crawler.find(".select-tag-section-body-tag", text: "_#{crawler.group}")
 
           if crawler.is_applicable_age?(user_age)
-            crawler.bookmark
+            crawler.open_bookmark
             crawler.add_to_list_based_on_academic_bg(
               spans: span_contents, not_engineer_list: not_engineer_group,
               user_name: user_name, user_age: user_age, csv: csv)
           else
             span_contents.each do |s|
-              crawler.bookmark
+              crawler.open_bookmark
               crawler.add_non_fav(not_engineer_group)
             end
             puts "36歳以上: " + user_name
