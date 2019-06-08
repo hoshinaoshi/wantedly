@@ -75,29 +75,28 @@ class Crawler
     not_engineer_group.trigger("click")
   end
 
-  def add_to_list_based_on_academic_bg(spans:, not_engineer_list:, user_name:, user_age:, csv:)
+  def add_to_list_based_on_academic_bg(spans:, not_engineer_list:, user_name:, user_age:, csv:, crawler:)
     csv_data = CSV.read(@pwd + "/csv/universities.csv").flatten
+    added = false
     spans.each do |s|
-      add_non_fav(not_engineer_list) and next unless is_applicable_background?(s.text)
+      #add_non_fav(not_engineer_list) and next unless is_applicable_background?(s.text)
 
       university = s.text
-
       if csv_data.select { |csv_univ| university.include?(csv_univ) }.empty? == false
         # if ~~~ empty? で_エンジニアグループに追加すると、追加すべき人を追加し損ねてしまうため、if ~~~ empty? == false でエンジニアグループに追加
-
-        engineer_group = all(".select-tag-section-body-tag", text: "エンジニア")[0]
-
-        engineer_group.trigger("click") if engineer_group[:class] == "select-tag-section-body-tag"
+        engineer_group = all(".select-tag-section-body-tag", text: "エンジニア").select{ |fav| fav.text == "エンジニア" }.first
+        sleep(3)
+        unless engineer_group[:class].include?("selected")
+          engineer_group.trigger("click") if engineer_group[:class] == "select-tag-section-body-tag"
+        end
         puts "追加した: " + user_name + " " + university + " " + user_age.to_s + "歳"
-
-      else
-        add_non_fav(not_engineer_list)
-        puts user_name + " " + university + " " + user_age.to_s + "歳 は、条件に満たない大卒である" if
-          /大学/.match(university) || /(u|U)niversity/.match(university)
-
-        # 条件に満たないと判断された大学を重複ありでusers_universities.csvに書き足し
-        csv << [s.text] unless csv.nil?
+        added = true
+        break
       end
+    end
+    unless added
+      puts "#{user_name} を弾きました"
+      crawler.all(".reject-button-action").first.trigger("click") unless added
     end
   end
 

@@ -1,4 +1,6 @@
 require_relative "crawler"
+require "capybara"
+require "capybara/dsl"
 
 crawler = Crawler.new
 
@@ -8,6 +10,8 @@ puts "年齢と学歴に関して修正がある場合は、玉井までお知�
 crawler.conditions.each do |condition|
   crawler.set_condition(".select-box li", condition)
 end
+crawler.visit(crawler.current_url.gsub("18-60", "18-35"))
+crawler.visit(crawler.current_url.gsub("18-60", "18-35"))
 
 sleep(10) # 各条件指定時にsleepしない代わりにここでsleepして、ユーザ一覧を読み込む
 # 年齢非公開のユーザは、学歴欄を目視確認する限り明らかに20代だと推測される場合でも、年齢絞込すると検索結果内で非表示になる
@@ -15,33 +19,41 @@ sleep(10) # 各条件指定時にsleepしない代わりにここでsleepして�
 
 crawler.judge_candidates_count("scout")
 
+130.times do |_|
+  sleep(5)
+  crawler.execute_script("window.scrollBy(0,500)")
+end
+
 CSV.open(crawler.pwd + "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| # 条件を満たさないと考えられた大学. "a"はadd
   trial = 0
   crawler.pages.times do
     trial += 1
-    if crawler.waitings >= 9
-      for num in 0..8 do # 一回のロードにつき10名のはずだが、失敗するため9名に
-        crawler.within(crawler.all("article.user-profile")[num]) do
-          span_contents = crawler.all(".name .clickable-name")
-          user_name = crawler.find("a.user-name").text
-          user_age = crawler.all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i
-          not_engineer_group = crawler.find(".select-tag-section-body-tag", text: "_#{crawler.group}")
+    for num in 0..601 do # 一回のロードにつき5名のはずだが、失敗するため4名に
+      sleep(5)
+      next if crawler.all("article.user-profile")[num].nil?
+      crawler.within(crawler.all("article.user-profile")[num]) do
+        span_contents = crawler.all(".name .clickable-name")
+        user_name = crawler.find("a.user-name").text
+        user_age = crawler.all("ul.user-activities .user-activity span")[1].text.gsub("歳", "").to_i
+        sleep(5)
+        not_engineer_group = crawler.find(".select-tag-section-body-tag", text: "_#{crawler.group}")
 
-          if crawler.is_applicable_age?(user_age)
+        if crawler.is_applicable_age?(user_age)
+          crawler.open_bookmark
+          crawler.add_to_list_based_on_academic_bg(
+            spans: span_contents, not_engineer_list: not_engineer_group,
+            user_name: user_name, user_age: user_age, csv: csv, crawler: crawler
+          )
+        else
+          span_contents.each do |s|
             crawler.open_bookmark
-            crawler.add_to_list_based_on_academic_bg(
-              spans: span_contents, not_engineer_list: not_engineer_group,
-              user_name: user_name, user_age: user_age, csv: csv)
-          else
-            span_contents.each do |s|
-              crawler.open_bookmark
-              crawler.add_non_fav(not_engineer_group)
-            end
-            puts "36歳以上: " + user_name
+            crawler.add_non_fav(not_engineer_group)
           end
+          puts "36歳以上: " + user_name
+          crawler.all(".reject-button-action").first.trigger("click")
         end
-        sleep(rand(10))
       end
+      sleep(rand(10))
     end
 
     # 前回読み込み時からかなり時間が経たないとスカウト候補者リストを更新できないため、ここで時間稼ぎ
@@ -54,10 +66,8 @@ CSV.open(crawler.pwd + "/csv/users_universities_#{ARGV[0]}.csv", "a") do |csv| #
     end
 
     puts "Starting to sleep for a few minutes"
-
     random = Random.new
     sleep(random.rand(100)+10)
-
   end
 end
 
